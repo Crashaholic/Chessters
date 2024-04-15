@@ -3,19 +3,25 @@ package com.sweatshop.chessters;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public class ChesstersGame extends ApplicationAdapter {
+
+
+public class ChesstersGame extends ApplicationAdapter
+{
 	SpriteBatch batch;
 	Texture img;
 	private OrthographicCamera camera;
 	private Rectangle bucket;
 	private Texture bucketTexture;
+	private ShapeRenderer shape;
 	
 	@Override
 	public void create()
@@ -27,6 +33,7 @@ public class ChesstersGame extends ApplicationAdapter {
 
 		bucket = new Rectangle(368, 20, 64, 64);
 		bucketTexture = new Texture("1007PART2TUT.png");
+		shape = new ShapeRenderer();
 	}
 
 	@Override
@@ -34,10 +41,10 @@ public class ChesstersGame extends ApplicationAdapter {
 	{
 		if (Gdx.input.isTouched())
 		{
-			Vector3 touchPos = new Vector3();
-			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(touchPos);
-			bucket.x = touchPos.x - 32;
+			Vector3 clickPos = new Vector3();
+			clickPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+			camera.unproject(clickPos);
+			bucket.x = clickPos.x - 32;
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
@@ -54,15 +61,27 @@ public class ChesstersGame extends ApplicationAdapter {
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		batch.draw(bucketTexture, bucket.x, bucket.y);
-		batch.draw(img, 0, 0);
+		for (int x = 0; x < 8; ++x)
+		{
+			for (int y = 0; y < 8; ++y)
+			{
+				shape.begin(ShapeRenderer.ShapeType.Filled);
+				if ((x + y) % 2 == 0)
+					shape.setColor(Color.BLACK);
+				else
+					shape.setColor(Color.WHITE);
+				shape.rect(x * 75, y * 75, 75, 75);
+				shape.end();
+			}
+		}
 		batch.end();
 	}
 	
 	@Override
 	public void dispose()
 	{
-		batch.dispose();
+		bucketTexture.dispose();
 		img.dispose();
+		batch.dispose();
 	}
 }
