@@ -29,7 +29,7 @@ public class ChessPiece
 
     public String GetSpriteName()
     {
-        return ((team==Team.WHITE)?"w":"b")+type.toString().toLowerCase();
+        return ((team == Team.WHITE) ? "w" : "b") + type.toString().toLowerCase();
     }
 
 }
