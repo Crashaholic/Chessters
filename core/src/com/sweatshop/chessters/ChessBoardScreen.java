@@ -212,6 +212,56 @@ public class ChessBoardScreen implements Screen
                             {
                                 SelectedTileX = x;
                                 SelectedTileY = y;
+                                //move logic
+                                if (board[x][y].team == ChessPiece.Team.WHITE)
+                                {
+                                    switch (board[x][y].type)
+                                    {
+                                        case BISHOP:
+
+                                            break;
+                                        case KNIGHT:
+
+                                            break;
+                                        case KING:
+
+                                            break;
+                                        case QUEEN:
+
+                                            break;
+                                        case ROOK:
+
+                                            break;
+                                        case PAWN:
+
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+
+                                    switch (board[x][y].type)
+                                    {
+                                        case BISHOP:
+
+                                            break;
+                                        case KNIGHT:
+
+                                            break;
+                                        case KING:
+
+                                            break;
+                                        case QUEEN:
+
+                                            break;
+                                        case ROOK:
+
+                                            break;
+                                        case PAWN:
+
+                                            break;
+                                    }
+                                }
                             }
                         }
                     }
