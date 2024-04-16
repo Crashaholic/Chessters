@@ -105,6 +105,7 @@ public class ChessBoardScreen implements Screen
         xy[1] = yComponent;
     }
 
+
     /*TO WELLSON: USE THIS!!!*/
     public void Move(int fromX, int fromY, int toX, int toY)
     {
@@ -346,66 +347,118 @@ public class ChessBoardScreen implements Screen
         if (SelectedTileX >= 0 && SelectedTileY >= 0)
         {
             if (board[SelectedTileX][SelectedTileY] != null) {
-                if(board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.WHITE) {
-                    switch (board[SelectedTileX][SelectedTileY].type) {
-                        case BISHOP:
-                            game.font.draw(game.batch, "W BISHOP", 600, 380);
-                            break;
-                        case KNIGHT:
-                            game.font.draw(game.batch, "W KNIGHT", 600, 380);
-                            break;
-                        case KING:
-                            game.font.draw(game.batch, "W KING", 600, 380);
-                            break;
-                        case QUEEN:
-                            game.font.draw(game.batch, "W QUEEN", 600, 380);
-                            break;
-                        case ROOK:
-                            game.font.draw(game.batch, "W ROOK", 600, 380);
-                            break;
-                        case PAWN:
-                            HighlightBySelectedTileOffset(0, 1);
-                            game.font.draw(game.batch, "W PAWN", 600, 380);
-                            //game.batch.draw(hlghtTile, SelectedTileX * 75, (SelectedTileY + 1) * 75, 75, 75);
-                            if (SelectedTileY == 1) {
-                                HighlightBySelectedTileOffset(0, 2);
-                                //game.batch.draw(hlghtTile, SelectedTileX * 75, (SelectedTileY + 2) * 75, 75, 75);
+                if(currentTurn == ChessPiece.Team.WHITE) {
+                    if (board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.WHITE) {
+                        switch (board[SelectedTileX][SelectedTileY].type) {
+                            case BISHOP:
+                                game.font.draw(game.batch, "W BISHOP", 600, 380);
+                                break;
+                            case KNIGHT:
+                                game.font.draw(game.batch, "W KNIGHT", 600, 380);
+                                break;
+                            case KING:
+                                game.font.draw(game.batch, "W KING", 600, 380);
+                                break;
+                            case QUEEN:
+                                game.font.draw(game.batch, "W QUEEN", 600, 380);
+                                break;
+                            case ROOK:
+                                game.font.draw(game.batch, "W ROOK", 600, 380);
+                                break;
+                            case PAWN:
+                                HighlightBySelectedTileOffset(0, 1);
+                                game.font.draw(game.batch, "W PAWN", 600, 380);
+                                if (SelectedTileY == 1) {
+                                    HighlightBySelectedTileOffset(0, 2);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+
+                    }
+                    else if(board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.BLACK) {
+                        switch (board[SelectedTileX][SelectedTileY].type) {
+                            case BISHOP:
+                                game.font.draw(game.batch, "B BISHOP", 600, 380);
+                                break;
+                            case KNIGHT:
+                                game.font.draw(game.batch, "B KNIGHT", 600, 380);
+                                break;
+                            case KING:
+                                game.font.draw(game.batch, "B KING", 600, 380);
+                                break;
+                            case QUEEN:
+                                game.font.draw(game.batch, "B QUEEN", 600, 380);
+                                break;
+                            case ROOK:
+                                game.font.draw(game.batch, "B ROOK", 600, 380);
+                                break;
+                            case PAWN:
+                                game.font.draw(game.batch, "B PAWN", 600, 380);
+                                break;
+                            default:
+                                break;
                             }
-                            break;
-                        default:
-                            break;
                     }
                 }
-                else if(board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.BLACK) {
-                    switch (board[SelectedTileX][SelectedTileY].type) {
-                        case BISHOP:
-                            game.font.draw(game.batch, "B BISHOP", 600, 380);
-                            break;
-                        case KNIGHT:
-                            game.font.draw(game.batch, "B KNIGHT", 600, 380);
-                            break;
-                        case KING:
-                            game.font.draw(game.batch, "B KING", 600, 380);
-                            break;
-                        case QUEEN:
-                            game.font.draw(game.batch, "B QUEEN", 600, 380);
-                            break;
-                        case ROOK:
-                            game.font.draw(game.batch, "B ROOK", 600, 380);
-                            break;
-                        case PAWN:
-                            HighlightBySelectedTileOffset(0, -1);
-                            game.font.draw(game.batch, "B PAWN", 600, 380);
-                            //game.batch.draw(hlghtTile, SelectedTileX * 75, (SelectedTileY + 1) * 75, 75, 75);
-                            if (SelectedTileY == 6) {
-                                HighlightBySelectedTileOffset(0, -2);
-                                //game.batch.draw(hlghtTile, SelectedTileX * 75, (SelectedTileY + 2) * 75, 75, 75);
-                            }
-                            break;
-                        default:
-                            break;
+                else {
+                    if (board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.WHITE) {
+                        switch (board[SelectedTileX][SelectedTileY].type) {
+                            case BISHOP:
+                                game.font.draw(game.batch, "W BISHOP", 600, 380);
+                                break;
+                            case KNIGHT:
+                                game.font.draw(game.batch, "W KNIGHT", 600, 380);
+                                break;
+                            case KING:
+                                game.font.draw(game.batch, "W KING", 600, 380);
+                                break;
+                            case QUEEN:
+                                game.font.draw(game.batch, "W QUEEN", 600, 380);
+                                break;
+                            case ROOK:
+                                game.font.draw(game.batch, "W ROOK", 600, 380);
+                                break;
+                            case PAWN:
+                                game.font.draw(game.batch, "W PAWN", 600, 380);
+                                break;
+                            default:
+                                break;
+                        }
+
+                    }
+                    else if(board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.BLACK) {
+                        switch (board[SelectedTileX][SelectedTileY].type) {
+                            case BISHOP:
+                                game.font.draw(game.batch, "B BISHOP", 600, 380);
+                                break;
+                            case KNIGHT:
+                                game.font.draw(game.batch, "B KNIGHT", 600, 380);
+                                break;
+                            case KING:
+                                game.font.draw(game.batch, "B KING", 600, 380);
+                                break;
+                            case QUEEN:
+                                game.font.draw(game.batch, "B QUEEN", 600, 380);
+                                break;
+                            case ROOK:
+                                game.font.draw(game.batch, "B ROOK", 600, 380);
+                                break;
+                            case PAWN:
+                                HighlightBySelectedTileOffset(0, -1);
+                                game.font.draw(game.batch, "B PAWN", 600, 380);
+                                if (SelectedTileY == 6) {
+                                    HighlightBySelectedTileOffset(0, -2);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
+
+
             }
             String str = ConvertIndexToString(SelectedTileX, SelectedTileY);
             game.font.draw(game.batch,"Selected: " + str, 600, 350);
