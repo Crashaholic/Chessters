@@ -193,7 +193,10 @@ public class ChessBoardScreen implements Screen
                 if (clickPos.x > x * 75 && clickPos.x <= (x + 1) * 75 &&
                     clickPos.y > y * 75 && clickPos.y <= (y + 1) * 75)
                 {
-                    game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+                    //check if tile has a piece
+                    if (board[x][y] != null) {
+                        game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+                    }
                 }
 
                 if (board[x][y] != null)
