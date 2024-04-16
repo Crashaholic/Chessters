@@ -3,6 +3,7 @@ package com.sweatshop.chessters;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
@@ -293,6 +294,8 @@ public class ChessBoardScreen implements Screen
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
+        game.font.setColor(Color.BLACK);
+        game.font.draw(game.batch, "Current Selected", 600, 400);
         //Gdx.app.log("Chessters", String.format("SelectedTile(X, Y): (%d, %d)", SelectedTileX, SelectedTileY));
         for (int y = 0; y < 8; ++y)
         {
@@ -310,41 +313,9 @@ public class ChessBoardScreen implements Screen
                     else
                         game.batch.draw(blackTile, x * 75, y * 75, 75, 75);
                 }
-                if (board[x][y] != null) {
-                switch (board[x][y].type)
-                {
-                    case BISHOP:
-
-                        break;
-                    case KNIGHT:
-
-                        break;
-                    case KING:
-
-                        break;
-                    case QUEEN:
-
-                        break;
-                    case ROOK:
-
-                        break;
-                    case PAWN:
-                        HighlightBySelectedTileOffset(0, 1);
-                        //game.batch.draw(HlghtTile, SelectedTileX * 75, (SelectedTileY + 1) * 75, 75, 75);
-                        if (SelectedTileY == 1) {
-                            HighlightBySelectedTileOffset(0, 2);
-                            //game.batch.draw(HlghtTile, SelectedTileX * 75, (SelectedTileY + 2) * 75, 75, 75);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                }
                 // if the click pos is within this tile's boundary
                 // boundary is current tile's x to next tile's x
                 // and current tile's y to next tile's y
-                //if (mousePos.x > x * 75 && mousePos.x <= (x + 1) * 75 &&
-                //    mousePos.y > y * 75 && mousePos.y <= (y + 1) * 75)
                 if (CheckBounds(mousePos.x, mousePos.y, x * 75, (x + 1) * 75, y * 75, (y + 1) * 75))
                 {
                     if (SelectedTileX != x || SelectedTileY != y)
@@ -369,6 +340,41 @@ public class ChessBoardScreen implements Screen
             {
                 Gdx.app.log("Chessters", "Resetting!");
                 Setup();
+            }
+        }
+
+        if (SelectedTileX >= 0 && SelectedTileY >= 0)
+        {
+            if (board[SelectedTileX][SelectedTileY] != null) {
+                switch (board[SelectedTileX][SelectedTileY].type)
+                {
+                    case BISHOP:
+
+                        break;
+                    case KNIGHT:
+
+                        break;
+                    case KING:
+
+                        break;
+                    case QUEEN:
+
+                        break;
+                    case ROOK:
+
+                        break;
+                    case PAWN:
+                        HighlightBySelectedTileOffset(0, 1);
+                        game.font.draw(game.batch, "PAWN", 600, 390);
+                        //game.batch.draw(hlghtTile, SelectedTileX * 75, (SelectedTileY + 1) * 75, 75, 75);
+                        if (SelectedTileY == 1) {
+                            HighlightBySelectedTileOffset(0, 2);
+                            //game.batch.draw(hlghtTile, SelectedTileX * 75, (SelectedTileY + 2) * 75, 75, 75);
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         game.batch.end();
