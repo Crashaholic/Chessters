@@ -188,7 +188,11 @@ public class ChessBoardScreen implements Screen
                 if (SelectedTileX == x && SelectedTileY == y)
                 {
                     game.batch.draw(SlectTile, SelectedTileX * 75, SelectedTileY * 75, 75, 75);
+                    //move logic
+
+
                 }
+
                 else
                 {
                     if ((x + y) % 2 == 0)
@@ -196,7 +200,32 @@ public class ChessBoardScreen implements Screen
                     else
                         game.batch.draw(BlackTile, x * 75, y * 75, 75, 75);
                 }
+                if (board[x][y] != null) {
+                switch (board[x][y].type)
+                {
+                    case BISHOP:
 
+                        break;
+                    case KNIGHT:
+
+                        break;
+                    case KING:
+
+                        break;
+                    case QUEEN:
+
+                        break;
+                    case ROOK:
+
+                        break;
+                    case PAWN:
+                        game.batch.draw(HlghtTile, SelectedTileX * 75, (SelectedTileY + 1) * 75, 75, 75);
+                        if (SelectedTileY == 1) {
+                            game.batch.draw(HlghtTile, SelectedTileX * 75, (SelectedTileY + 2) * 75, 75, 75);
+                        }
+                        break;
+                }
+                }
                 // if the click pos is within this tile's boundary
                 // boundary is current tile's x to next tile's x
                 // and current tile's y to next tile's y
@@ -212,56 +241,6 @@ public class ChessBoardScreen implements Screen
                             {
                                 SelectedTileX = x;
                                 SelectedTileY = y;
-                                //move logic
-                                if (board[x][y].team == ChessPiece.Team.WHITE)
-                                {
-                                    switch (board[x][y].type)
-                                    {
-                                        case BISHOP:
-
-                                            break;
-                                        case KNIGHT:
-
-                                            break;
-                                        case KING:
-
-                                            break;
-                                        case QUEEN:
-
-                                            break;
-                                        case ROOK:
-
-                                            break;
-                                        case PAWN:
-
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-
-                                    switch (board[x][y].type)
-                                    {
-                                        case BISHOP:
-
-                                            break;
-                                        case KNIGHT:
-
-                                            break;
-                                        case KING:
-
-                                            break;
-                                        case QUEEN:
-
-                                            break;
-                                        case ROOK:
-
-                                            break;
-                                        case PAWN:
-
-                                            break;
-                                    }
-                                }
                             }
                         }
                     }
