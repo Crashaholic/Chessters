@@ -19,6 +19,8 @@ public class ChessBoardScreen implements Screen
     public ChessPiece[/*column*/][/*row*/] board;
     private Rectangle bucket;
 
+    private Texture yeah;
+
     private Texture WhiteTile;
     private Texture BlackTile;
 
@@ -51,6 +53,8 @@ public class ChessBoardScreen implements Screen
         bucket = new Rectangle();
 
         board = new ChessPiece[8][8];
+
+        yeah = new Texture(Gdx.files.internal("1007PART2TUT.png"));
 
         WhiteTile = new Texture(Gdx.files.internal("wtile.png"));
         BlackTile = new Texture(Gdx.files.internal("btile.png"));
@@ -156,9 +160,9 @@ public class ChessBoardScreen implements Screen
     @Override
     public void render(float dt)
     {
+        Vector3 clickPos = new Vector3();
         if (Gdx.input.isTouched())
         {
-            Vector3 clickPos = new Vector3();
             clickPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPos);
             bucket.x = clickPos.x - 32;
@@ -182,6 +186,15 @@ public class ChessBoardScreen implements Screen
                     game.batch.draw(WhiteTile, x * 75, y * 75, 75, 75);
                 else
                     game.batch.draw(BlackTile, x * 75, y * 75, 75, 75);
+
+                if (clickPos.x > x * 75 && clickPos.x <= (x + 1) * 75 &&
+                    clickPos.y > y * 75 && clickPos.y <= (y + 1) * 75)
+                {
+                    if ((x + y) % 2 == 0)
+                        game.batch.draw(BlackTile, x * 75, y * 75, 75, 75);
+                    else
+                        game.batch.draw(WhiteTile, x * 75, y * 75, 75, 75);
+                }
 
                 if (board[x][y] != null)
                 {
