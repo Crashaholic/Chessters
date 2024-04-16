@@ -195,11 +195,11 @@ public class ChessBoardScreen implements Screen
     public String ConvertIndexToString(int x, int y)
     {
         char xComponent = 'A';
-        xComponent += (char) x;
+        xComponent += (char)x;
         y += 1;
-        String x1 = "" + xComponent;
+        String x1 = String.valueOf(xComponent);
         String y1 = "" + y;
-        return String.join(x1, y1);
+        return x1 + y1;
     }
 
     @Override
@@ -365,7 +365,7 @@ public class ChessBoardScreen implements Screen
                         break;
                     case PAWN:
                         HighlightBySelectedTileOffset(0, 1);
-                        game.font.draw(game.batch, "PAWN", 600, 390);
+                        game.font.draw(game.batch, "PAWN", 600, 380);
                         //game.batch.draw(hlghtTile, SelectedTileX * 75, (SelectedTileY + 1) * 75, 75, 75);
                         if (SelectedTileY == 1) {
                             HighlightBySelectedTileOffset(0, 2);
@@ -376,6 +376,8 @@ public class ChessBoardScreen implements Screen
                         break;
                 }
             }
+            String str = ConvertIndexToString(SelectedTileX, SelectedTileY);
+            game.font.draw(game.batch,"Selected: " + str, 600, 350);
         }
         game.batch.end();
 
