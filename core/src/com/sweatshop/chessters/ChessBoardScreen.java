@@ -14,25 +14,24 @@ public class ChessBoardScreen implements Screen
     final ChesstersGame game;
     public ChessPiece[/*column*/][/*row*/] board;
 
-    private final Texture HlghtTile;
-    private final Texture SlectTile;
+    private final Texture hlghtTile;
+    private final Texture slectTile;
+    private final Texture whiteTile;
+    private final Texture blackTile;
 
-    private final Texture WhiteTile;
-    private final Texture BlackTile;
+    private final Texture whiteRook;
+    private final Texture whiteKing;
+    private final Texture whiteQuen;
+    private final Texture whiteBish;
+    private final Texture whiteKngt;
+    private final Texture whitePawn;
 
-    private final Texture WhiteRook;
-    private final Texture WhiteKing;
-    private final Texture WhiteQuen;
-    private final Texture WhiteBish;
-    private final Texture WhiteKngt;
-    private final Texture WhitePawn;
-
-    private final Texture BlackRook;
-    private final Texture BlackKing;
-    private final Texture BlackQuen;
-    private final Texture BlackBish;
-    private final Texture BlackKngt;
-    private final Texture BlackPawn;
+    private final Texture blackRook;
+    private final Texture blackKing;
+    private final Texture blackQuen;
+    private final Texture blackBish;
+    private final Texture blackKngt;
+    private final Texture blackPawn;
 
     private ChessPiece.Team currentTurn;
 
@@ -56,54 +55,73 @@ public class ChessBoardScreen implements Screen
 
         board = new ChessPiece[8][8];
 
-        HlghtTile = new Texture(Gdx.files.internal("htile.png"));
-        SlectTile = new Texture(Gdx.files.internal("stile.png"));
-        WhiteTile = new Texture(Gdx.files.internal("wtile.png"));
-        BlackTile = new Texture(Gdx.files.internal("btile.png"));
+        hlghtTile = new Texture(Gdx.files.internal("htile.png"));
+        slectTile = new Texture(Gdx.files.internal("stile.png"));
+        whiteTile = new Texture(Gdx.files.internal("wtile.png"));
+        blackTile = new Texture(Gdx.files.internal("btile.png"));
 
-        WhiteRook = new Texture(Gdx.files.internal("wrook.png"));
-        WhiteKing = new Texture(Gdx.files.internal("wking.png"));
-        WhiteQuen = new Texture(Gdx.files.internal("wquen.png"));
-        WhiteBish = new Texture(Gdx.files.internal("wbish.png"));
-        WhiteKngt = new Texture(Gdx.files.internal("wkngt.png"));
-        WhitePawn = new Texture(Gdx.files.internal("wpawn.png"));
+        whiteRook = new Texture(Gdx.files.internal("wrook.png"));
+        whiteKing = new Texture(Gdx.files.internal("wking.png"));
+        whiteQuen = new Texture(Gdx.files.internal("wquen.png"));
+        whiteBish = new Texture(Gdx.files.internal("wbish.png"));
+        whiteKngt = new Texture(Gdx.files.internal("wkngt.png"));
+        whitePawn = new Texture(Gdx.files.internal("wpawn.png"));
 
-        WhiteRook.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        WhiteKing.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        WhiteQuen.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        WhiteBish.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        WhiteKngt.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        WhitePawn.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        whiteRook.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        whiteKing.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        whiteQuen.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        whiteBish.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        whiteKngt.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        whitePawn.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        BlackRook = new Texture(Gdx.files.internal("brook.png"));
-        BlackKing = new Texture(Gdx.files.internal("bking.png"));
-        BlackQuen = new Texture(Gdx.files.internal("bquen.png"));
-        BlackBish = new Texture(Gdx.files.internal("bbish.png"));
-        BlackKngt = new Texture(Gdx.files.internal("bkngt.png"));
-        BlackPawn = new Texture(Gdx.files.internal("bpawn.png"));
+        blackRook = new Texture(Gdx.files.internal("brook.png"));
+        blackKing = new Texture(Gdx.files.internal("bking.png"));
+        blackQuen = new Texture(Gdx.files.internal("bquen.png"));
+        blackBish = new Texture(Gdx.files.internal("bbish.png"));
+        blackKngt = new Texture(Gdx.files.internal("bkngt.png"));
+        blackPawn = new Texture(Gdx.files.internal("bpawn.png"));
 
-        BlackRook.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        BlackKing.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        BlackQuen.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        BlackBish.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        BlackKngt.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        BlackPawn.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        blackRook.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        blackKing.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        blackQuen.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        blackBish.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        blackKngt.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        blackPawn.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+    }
 
-
+    public boolean CheckBounds(float pointX, float pointY, float xMinBound, float xMaxBound, float yMinBound, float yMaxBound)
+    {
+        return (pointX >= xMinBound && pointX < xMaxBound &&
+                pointY >= yMinBound && pointY < yMaxBound);
     }
 
     /*turn A1 -> 0*/
-    public int GetIndex(String gridCode)
+    public void GetIndex(String gridCode, int[] xy)
     {
-        return 0;
+        int xComponent = gridCode.charAt(0) - 'A';
+        int yComponent = gridCode.charAt(1) - 1;
+        xy[0] = xComponent;
+        xy[1] = yComponent;
+    }
+
+    /*TO WELLSON: USE THIS!!!*/
+    public void Move(int fromX, int fromY, int toX, int toY)
+    {
+
     }
 
     /*Move from A1 to B4*/
     public void Move(String from, String to)
     {
-        int idx_from, idx_to;
-        idx_from = GetIndex(from);
-        idx_to = GetIndex(to);
+        int[] idxFromXY = new int[2], idxToXY = new int[2];
+        GetIndex(from, idxFromXY);
+        GetIndex(to, idxToXY);
+        int idxFromX, idxFromY, idxToX, idxToY;
+        idxFromX = idxFromXY[0];
+        idxFromY = idxFromXY[1];
+        idxToX = idxToXY[0];
+        idxToY = idxToXY[1];
+        Move(idxFromX, idxFromY, idxToX, idxToY);
     }
     
     public void Setup()
@@ -143,15 +161,9 @@ public class ChessBoardScreen implements Screen
         board[7][6] = new ChessPiece(ChessPiece.Team.BLACK, ChessPiece.Piece_Type.PAWN);
     }
 
-    public boolean CheckBounds(float pointX, float pointY, float xMinBound, float xMaxBound, float yMinBound, float yMaxBound)
-    {
-        return (pointX >= xMinBound && pointX < xMaxBound &&
-                pointY >= yMinBound && pointY < yMaxBound);
-    }
-
     public void HighlightTile(int x, int y)
     {
-        game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+        game.batch.draw(hlghtTile, x * 75, y * 75, 75, 75);
     }
 
     public void HighlightBySelectedTileOffset(int xOffset, int yOffset)
@@ -159,9 +171,34 @@ public class ChessBoardScreen implements Screen
         HighlightTile(SelectedTileX + xOffset, SelectedTileY + yOffset);
     }
 
-    public boolean ValidMove()
+    /*TO WELLSON: USE THIS!!!*/
+    public boolean ValidMove(int fromX, int fromY, int toX, int toY)
     {
         return false;
+    }
+
+    public boolean ValidMove(String from, String to)
+    {
+        int[] idxFromXY = new int[2], idxToXY = new int[2];
+        GetIndex(from, idxFromXY);
+        GetIndex(to, idxToXY);
+        int idxFromX, idxFromY, idxToX, idxToY;
+        idxFromX = idxFromXY[0];
+        idxFromY = idxFromXY[1];
+        idxToX = idxToXY[0];
+        idxToY = idxToXY[1];
+        return ValidMove(idxFromX, idxFromY, idxToX, idxToY);
+    }
+
+    // to change from index to string, use to print
+    public String ConvertIndexToString(int x, int y)
+    {
+        char xComponent = 'A';
+        xComponent += (char) x;
+        y += 1;
+        String x1 = "" + xComponent;
+        String y1 = "" + y;
+        return String.join(x1, y1);
     }
 
     @Override
@@ -172,7 +209,67 @@ public class ChessBoardScreen implements Screen
 
     public void DrawPiece(Texture t, float x, float y)
     {
-        game.batch.draw(t, x + 7.5f, y + 7.5f, 60, 60);
+        game.pieceBatch.draw(t, x + 7.5f, y + 7.5f, 60, 60);
+    }
+
+    public void DrawChessPieces()
+    {
+        for (int x = 0; x < 8; ++x )
+        {
+            for (int y = 0; y < 8; ++y)
+            {
+                if (board[x][y] != null)
+                {
+                    if (board[x][y].team == ChessPiece.Team.WHITE)
+                    {
+                        switch (board[x][y].type)
+                        {
+                            case BISHOP:
+                                DrawPiece(whiteBish, x * 75, y * 75);
+                                break;
+                            case KNIGHT:
+                                DrawPiece(whiteKngt, x * 75, y * 75);
+                                break;
+                            case KING:
+                                DrawPiece(whiteKing, x * 75, y * 75);
+                                break;
+                            case QUEEN:
+                                DrawPiece(whiteQuen, x * 75, y * 75);
+                                break;
+                            case ROOK:
+                                DrawPiece(whiteRook, x * 75, y * 75);
+                                break;
+                            case PAWN:
+                                DrawPiece(whitePawn, x * 75, y * 75);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (board[x][y].type) {
+                            case BISHOP:
+                                DrawPiece(blackBish, x * 75, y * 75);
+                                break;
+                            case KNIGHT:
+                                DrawPiece(blackKngt, x * 75, y * 75);
+                                break;
+                            case KING:
+                                DrawPiece(blackKing, x * 75, y * 75);
+                                break;
+                            case QUEEN:
+                                DrawPiece(blackQuen, x * 75, y * 75);
+                                break;
+                            case ROOK:
+                                DrawPiece(blackRook, x * 75, y * 75);
+                                break;
+                            case PAWN:
+                                DrawPiece(blackPawn, x * 75, y * 75);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -203,18 +300,15 @@ public class ChessBoardScreen implements Screen
             {
                 if (SelectedTileX == x && SelectedTileY == y)
                 {
-                    game.batch.draw(SlectTile, SelectedTileX * 75, SelectedTileY * 75, 75, 75);
+                    game.batch.draw(slectTile, SelectedTileX * 75, SelectedTileY * 75, 75, 75);
                     //move logic
-
-
                 }
-
                 else
                 {
                     if ((x + y) % 2 == 0)
-                        game.batch.draw(WhiteTile, x * 75, y * 75, 75, 75);
+                        game.batch.draw(whiteTile, x * 75, y * 75, 75, 75);
                     else
-                        game.batch.draw(BlackTile, x * 75, y * 75, 75, 75);
+                        game.batch.draw(blackTile, x * 75, y * 75, 75, 75);
                 }
                 if (board[x][y] != null) {
                 switch (board[x][y].type)
@@ -235,10 +329,14 @@ public class ChessBoardScreen implements Screen
 
                         break;
                     case PAWN:
-                        game.batch.draw(HlghtTile, SelectedTileX * 75, (SelectedTileY + 1) * 75, 75, 75);
+                        HighlightBySelectedTileOffset(0, 1);
+                        //game.batch.draw(HlghtTile, SelectedTileX * 75, (SelectedTileY + 1) * 75, 75, 75);
                         if (SelectedTileY == 1) {
-                            game.batch.draw(HlghtTile, SelectedTileX * 75, (SelectedTileY + 2) * 75, 75, 75);
+                            HighlightBySelectedTileOffset(0, 2);
+                            //game.batch.draw(HlghtTile, SelectedTileX * 75, (SelectedTileY + 2) * 75, 75, 75);
                         }
+                        break;
+                    default:
                         break;
                 }
                 }
@@ -253,7 +351,7 @@ public class ChessBoardScreen implements Screen
                     {
                         //check if tile has a piece
                         if (board[x][y] != null) {
-                            game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+                            game.batch.draw(hlghtTile, x * 75, y * 75, 75, 75);
                             if (Gdx.input.isTouched())
                             {
                                 SelectedTileX = x;
@@ -262,62 +360,22 @@ public class ChessBoardScreen implements Screen
                         }
                     }
                 }
-
-                if (board[x][y] != null)
-                {
-                    if (board[x][y].team == ChessPiece.Team.WHITE)
-                    {
-                        switch (board[x][y].type)
-                        {
-                            case BISHOP:
-                                DrawPiece(WhiteBish, x * 75, y * 75);
-                                break;
-                            case KNIGHT:
-                                DrawPiece(WhiteKngt, x * 75, y * 75);
-                                break;
-                            case KING:
-                                DrawPiece(WhiteKing, x * 75, y * 75);
-                                break;
-                            case QUEEN:
-                                DrawPiece(WhiteQuen, x * 75, y * 75);
-                                break;
-                            case ROOK:
-                                DrawPiece(WhiteRook, x * 75, y * 75);
-                                break;
-                            case PAWN:
-                                DrawPiece(WhitePawn, x * 75, y * 75);
-                                break;
-                        }
-                    }
-                    else
-                    {
-
-                        switch (board[x][y].type)
-                        {
-                            case BISHOP:
-                                DrawPiece(BlackBish, x * 75, y * 75);
-                                break;
-                            case KNIGHT:
-                                DrawPiece(BlackKngt, x * 75, y * 75);
-                                break;
-                            case KING:
-                                DrawPiece(BlackKing, x * 75, y * 75);
-                                break;
-                            case QUEEN:
-                                DrawPiece(BlackQuen, x * 75, y * 75);
-                                break;
-                            case ROOK:
-                                DrawPiece(BlackRook, x * 75, y * 75);
-                                break;
-                            case PAWN:
-                                DrawPiece(BlackPawn, x * 75, y * 75);
-                                break;
-                        }
-                    }
-                }
+            }
+        }
+        game.batch.draw(slectTile, 75 * 8, 10, 200, 50);
+        if (CheckBounds(mousePos.x, mousePos.y, 75 * 8, 75 * 8 + 200, 10, 10 + 50))
+        {
+            if (Gdx.input.isTouched())
+            {
+                Gdx.app.log("Chessters", "Resetting!");
+                Setup();
             }
         }
         game.batch.end();
+
+        game.pieceBatch.begin();
+        DrawChessPieces();
+        game.pieceBatch.end();
     }
 
     @Override
@@ -342,21 +400,23 @@ public class ChessBoardScreen implements Screen
 
     @Override
     public void dispose() {
-        HlghtTile.dispose();
-        SlectTile.dispose();
-        WhiteTile.dispose();
-        BlackTile.dispose();
-        WhiteRook.dispose();
-        WhiteKing.dispose();
-        WhiteQuen.dispose();
-        WhiteBish.dispose();
-        WhiteKngt.dispose();
-        WhitePawn.dispose();
-        BlackRook.dispose();
-        BlackKing.dispose();
-        BlackQuen.dispose();
-        BlackBish.dispose();
-        BlackKngt.dispose();
-        BlackPawn.dispose();
+        hlghtTile.dispose();
+        slectTile.dispose();
+        whiteTile.dispose();
+        blackTile.dispose();
+
+        whiteRook.dispose();
+        whiteKing.dispose();
+        whiteQuen.dispose();
+        whiteBish.dispose();
+        whiteKngt.dispose();
+        whitePawn.dispose();
+
+        blackRook.dispose();
+        blackKing.dispose();
+        blackQuen.dispose();
+        blackBish.dispose();
+        blackKngt.dispose();
+        blackPawn.dispose();
     }
 }
