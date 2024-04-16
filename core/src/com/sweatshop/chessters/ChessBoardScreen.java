@@ -40,12 +40,17 @@ public class ChessBoardScreen implements Screen
     private Texture BlackPawn;
 
 
+    private int SelectedTileX;
+    private int SelectedTileY;
+
     OrthographicCamera camera;
     FitViewport fitViewport;
 
     public ChessBoardScreen(final ChesstersGame game)
     {
         this.game = game;
+
+        SelectedTileX = SelectedTileY = -1;
 
         camera = new OrthographicCamera();
         fitViewport = new FitViewport(600, 600);
@@ -161,12 +166,9 @@ public class ChessBoardScreen implements Screen
     @Override
     public void render(float dt)
     {
-        Vector3 clickPos = new Vector3();
-        if (Gdx.input.isTouched())
-        {
-            clickPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(clickPos);
-        }
+        Vector3 mousePos = new Vector3();
+        mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        camera.unproject(mousePos);
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
             bucket.x -= 200 * dt;
@@ -182,6 +184,7 @@ public class ChessBoardScreen implements Screen
         {
             for (int x = 0; x < 8; ++x)
             {
+                game.batch.draw(SlectTile, SelectedTileX * 75, SelectedTileY * 75, 75, 75);
                 if ((x + y) % 2 == 0)
                     game.batch.draw(WhiteTile, x * 75, y * 75, 75, 75);
                 else
@@ -190,9 +193,14 @@ public class ChessBoardScreen implements Screen
                 // if the click pos is within this tile's boundary
                 // boundary is current tile's x to next tile's x
                 // and current tile's y to next tile's y
-                if (clickPos.x > x * 75 && clickPos.x <= (x + 1) * 75 &&
-                    clickPos.y > y * 75 && clickPos.y <= (y + 1) * 75)
+                if (mousePos.x > x * 75 && mousePos.x <= (x + 1) * 75 &&
+                    mousePos.y > y * 75 && mousePos.y <= (y + 1) * 75)
                 {
+                    if (Gdx.input.isTouched())
+                    {
+                        SelectedTileX = x;
+                        SelectedTileY = y;
+                    }
                     game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
                 }
 
@@ -248,7 +256,6 @@ public class ChessBoardScreen implements Screen
                         }
                     }
                 }
-
             }
         }
         game.batch.end();
