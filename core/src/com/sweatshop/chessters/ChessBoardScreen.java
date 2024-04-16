@@ -203,19 +203,17 @@ public class ChessBoardScreen implements Screen
                 if (mousePos.x > x * 75 && mousePos.x <= (x + 1) * 75 &&
                     mousePos.y > y * 75 && mousePos.y <= (y + 1) * 75)
                 {
-                    if (Gdx.input.isTouched())
+                    if (SelectedTileX != x || SelectedTileY != y)
                     {
-                        SelectedTileX = x;
-                        SelectedTileY = y;
-                    }
-                    if (SelectedTileX == x && SelectedTileY == y)
-                    {
-                        game.batch.draw(SlectTile, SelectedTileX * 75, SelectedTileY * 75, 75, 75);
-                    }
-                    //check if tile has a piece
-                    else if (board[x][y] != null)
-                    {
-                        game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+                        //check if tile has a piece
+                        if (board[x][y] != null) {
+                            game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+                            if (Gdx.input.isTouched())
+                            {
+                                SelectedTileX = x;
+                                SelectedTileY = y;
+                            }
+                        }
                     }
                 }
 
