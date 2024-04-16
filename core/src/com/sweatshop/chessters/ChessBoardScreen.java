@@ -353,6 +353,13 @@ public class ChessBoardScreen implements Screen
                         switch (board[SelectedTileX][SelectedTileY].type) {
                             case BISHOP:
                                 game.font.draw(game.batch, "W BISHOP", 600, 380);
+                                for (int i = 0; i < 8; i++ ) {
+                                    HighlightBySelectedTileOffset(i, i);
+                                    HighlightBySelectedTileOffset(-i, -i);
+                                    HighlightBySelectedTileOffset(i, -i);
+                                    HighlightBySelectedTileOffset(-i, i);
+                                }
+
                                 break;
                             case KNIGHT:
                                 game.font.draw(game.batch, "W KNIGHT", 600, 380);
