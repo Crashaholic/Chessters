@@ -180,15 +180,22 @@ public class ChessBoardScreen implements Screen
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
+        //Gdx.app.log("Chessters", String.format("SelectedTile(X, Y): (%d, %d)", SelectedTileX, SelectedTileY));
         for (int y = 0; y < 8; ++y)
         {
             for (int x = 0; x < 8; ++x)
             {
-                game.batch.draw(SlectTile, SelectedTileX * 75, SelectedTileY * 75, 75, 75);
-                if ((x + y) % 2 == 0)
-                    game.batch.draw(WhiteTile, x * 75, y * 75, 75, 75);
+                if (SelectedTileX == x && SelectedTileY == y)
+                {
+                    game.batch.draw(SlectTile, SelectedTileX * 75, SelectedTileY * 75, 75, 75);
+                }
                 else
-                    game.batch.draw(BlackTile, x * 75, y * 75, 75, 75);
+                {
+                    if ((x + y) % 2 == 0)
+                        game.batch.draw(WhiteTile, x * 75, y * 75, 75, 75);
+                    else
+                        game.batch.draw(BlackTile, x * 75, y * 75, 75, 75);
+                }
 
                 // if the click pos is within this tile's boundary
                 // boundary is current tile's x to next tile's x
@@ -201,9 +208,13 @@ public class ChessBoardScreen implements Screen
                         SelectedTileX = x;
                         SelectedTileY = y;
                     }
-                    game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+                    if (SelectedTileX == x && SelectedTileY == y)
+                    {
+                        game.batch.draw(SlectTile, SelectedTileX * 75, SelectedTileY * 75, 75, 75);
+                    }
                     //check if tile has a piece
-                    if (board[x][y] != null) {
+                    else if (board[x][y] != null)
+                    {
                         game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
                     }
                 }
