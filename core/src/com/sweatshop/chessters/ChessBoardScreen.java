@@ -349,23 +349,23 @@ public class ChessBoardScreen implements Screen
                 if(board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.WHITE) {
                     switch (board[SelectedTileX][SelectedTileY].type) {
                         case BISHOP:
-                            game.font.draw(game.batch, "W BISHOP", 600, 390);
+                            game.font.draw(game.batch, "W BISHOP", 600, 380);
                             break;
                         case KNIGHT:
-                            game.font.draw(game.batch, "W KNIGHT", 600, 390);
+                            game.font.draw(game.batch, "W KNIGHT", 600, 380);
                             break;
                         case KING:
-                            game.font.draw(game.batch, "W KING", 600, 390);
+                            game.font.draw(game.batch, "W KING", 600, 380);
                             break;
                         case QUEEN:
-                            game.font.draw(game.batch, "W QUEEN", 600, 390);
+                            game.font.draw(game.batch, "W QUEEN", 600, 380);
                             break;
                         case ROOK:
-                            game.font.draw(game.batch, "W ROOK", 600, 390);
+                            game.font.draw(game.batch, "W ROOK", 600, 380);
                             break;
                         case PAWN:
                             HighlightBySelectedTileOffset(0, 1);
-                            game.font.draw(game.batch, "W PAWN", 600, 390);
+                            game.font.draw(game.batch, "W PAWN", 600, 380);
                             //game.batch.draw(hlghtTile, SelectedTileX * 75, (SelectedTileY + 1) * 75, 75, 75);
                             if (SelectedTileY == 1) {
                                 HighlightBySelectedTileOffset(0, 2);
@@ -379,19 +379,19 @@ public class ChessBoardScreen implements Screen
                 else if(board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.BLACK) {
                     switch (board[SelectedTileX][SelectedTileY].type) {
                         case BISHOP:
-                            game.font.draw(game.batch, "B BISHOP", 600, 390);
+                            game.font.draw(game.batch, "B BISHOP", 600, 380);
                             break;
                         case KNIGHT:
-                            game.font.draw(game.batch, "BKNIGHT", 600, 390);
+                            game.font.draw(game.batch, "B KNIGHT", 600, 380);
                             break;
                         case KING:
-                            game.font.draw(game.batch, "B KING", 600, 390);
+                            game.font.draw(game.batch, "B KING", 600, 380);
                             break;
                         case QUEEN:
-                            game.font.draw(game.batch, "B QUEEN", 600, 390);
+                            game.font.draw(game.batch, "B QUEEN", 600, 380);
                             break;
                         case ROOK:
-                            game.font.draw(game.batch, "B ROOK", 600, 390);
+                            game.font.draw(game.batch, "B ROOK", 600, 380);
                             break;
                         case PAWN:
                             HighlightBySelectedTileOffset(0, -1);
