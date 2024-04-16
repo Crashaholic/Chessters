@@ -19,7 +19,8 @@ public class ChessBoardScreen implements Screen
     public ChessPiece[/*column*/][/*row*/] board;
     private Rectangle bucket;
 
-    private Texture yeah;
+    private Texture HlghtTile;
+    private Texture SlectTile;
 
     private Texture WhiteTile;
     private Texture BlackTile;
@@ -54,8 +55,8 @@ public class ChessBoardScreen implements Screen
 
         board = new ChessPiece[8][8];
 
-        yeah = new Texture(Gdx.files.internal("1007PART2TUT.png"));
-
+        HlghtTile = new Texture(Gdx.files.internal("htile.png"));
+        SlectTile = new Texture(Gdx.files.internal("stile.png"));
         WhiteTile = new Texture(Gdx.files.internal("wtile.png"));
         BlackTile = new Texture(Gdx.files.internal("btile.png"));
 
@@ -165,7 +166,6 @@ public class ChessBoardScreen implements Screen
         {
             clickPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPos);
-            bucket.x = clickPos.x - 32;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
@@ -187,13 +187,13 @@ public class ChessBoardScreen implements Screen
                 else
                     game.batch.draw(BlackTile, x * 75, y * 75, 75, 75);
 
+                // if the click pos is within this tile's boundary
+                // boundary is current tile's x to next tile's x
+                // and current tile's y to next tile's y
                 if (clickPos.x > x * 75 && clickPos.x <= (x + 1) * 75 &&
                     clickPos.y > y * 75 && clickPos.y <= (y + 1) * 75)
                 {
-                    if ((x + y) % 2 == 0)
-                        game.batch.draw(BlackTile, x * 75, y * 75, 75, 75);
-                    else
-                        game.batch.draw(WhiteTile, x * 75, y * 75, 75, 75);
+                    game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
                 }
 
                 if (board[x][y] != null)
