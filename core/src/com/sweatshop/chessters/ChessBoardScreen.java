@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import java.util.stream.IntStream;
 
 public class ChessBoardScreen implements Screen
 {
@@ -47,7 +48,6 @@ public class ChessBoardScreen implements Screen
         this.game = game;
 
         currentTurn = ChessPiece.Team.WHITE;
-
         SelectedTileX = SelectedTileY = -1;
 
         camera = new OrthographicCamera();
@@ -189,7 +189,9 @@ public class ChessBoardScreen implements Screen
 
     public void HighlightBySelectedTileOffset(int xOffset, int yOffset)
     {
+        if ((SelectedTileX + xOffset) < 8 && (SelectedTileY + yOffset) < 8 ) {
         HighlightTile(SelectedTileX + xOffset, SelectedTileY + yOffset);
+        }
     }
 
     // to change from index to string, use to print
@@ -343,7 +345,6 @@ public class ChessBoardScreen implements Screen
                 Setup();
             }
         }
-
         if (SelectedTileX >= 0 && SelectedTileY >= 0)
         {
             if (board[SelectedTileX][SelectedTileY] != null) {
@@ -355,6 +356,16 @@ public class ChessBoardScreen implements Screen
                                 break;
                             case KNIGHT:
                                 game.font.draw(game.batch, "W KNIGHT", 600, 380);
+
+                                    HighlightBySelectedTileOffset(1, 2);
+                                    HighlightBySelectedTileOffset(-1, 2);
+                                    HighlightBySelectedTileOffset(1, -2);
+                                    HighlightBySelectedTileOffset(-1, -2);
+                                    HighlightBySelectedTileOffset(2, 1);
+                                    HighlightBySelectedTileOffset(2, -1);
+                                    HighlightBySelectedTileOffset(-2, 1);
+                                    HighlightBySelectedTileOffset(-2, -1);
+
                                 break;
                             case KING:
                                 game.font.draw(game.batch, "W KING", 600, 380);
@@ -364,12 +375,20 @@ public class ChessBoardScreen implements Screen
                                 break;
                             case ROOK:
                                 game.font.draw(game.batch, "W ROOK", 600, 380);
+                                for (int i = 0; i < 8; i++ ) {
+                                        if (board[SelectedTileX][i] == null) {
+                                            HighlightBySelectedTileOffset(0, i);
+                                        }
+                                        if (board[i][SelectedTileY] == null) {
+                                            HighlightBySelectedTileOffset(i, 0);
+                                        }
+                                }
                                 break;
                             case PAWN:
                                 HighlightBySelectedTileOffset(0, 1);
                                 game.font.draw(game.batch, "W PAWN", 600, 380);
                                 if (SelectedTileY == 1) {
-                                    HighlightBySelectedTileOffset(0, 2);
+                                        HighlightBySelectedTileOffset(0, 2);
                                 }
                                 break;
                             default:
