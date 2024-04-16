@@ -111,6 +111,12 @@ public class ChessBoardScreen implements Screen
 
     }
 
+    /*TO WELLSON: USE THIS!!!*/
+    public boolean ValidMove(int fromX, int fromY, int toX, int toY)
+    {
+        return false;
+    }
+
     /*Move from A1 to B4*/
     public void Move(String from, String to)
     {
@@ -123,6 +129,19 @@ public class ChessBoardScreen implements Screen
         idxToX = idxToXY[0];
         idxToY = idxToXY[1];
         Move(idxFromX, idxFromY, idxToX, idxToY);
+    }
+
+    public boolean ValidMove(String from, String to)
+    {
+        int[] idxFromXY = new int[2], idxToXY = new int[2];
+        GetIndex(from, idxFromXY);
+        GetIndex(to, idxToXY);
+        int idxFromX, idxFromY, idxToX, idxToY;
+        idxFromX = idxFromXY[0];
+        idxFromY = idxFromXY[1];
+        idxToX = idxToXY[0];
+        idxToY = idxToXY[1];
+        return ValidMove(idxFromX, idxFromY, idxToX, idxToY);
     }
     
     public void Setup()
@@ -170,25 +189,6 @@ public class ChessBoardScreen implements Screen
     public void HighlightBySelectedTileOffset(int xOffset, int yOffset)
     {
         HighlightTile(SelectedTileX + xOffset, SelectedTileY + yOffset);
-    }
-
-    /*TO WELLSON: USE THIS!!!*/
-    public boolean ValidMove(int fromX, int fromY, int toX, int toY)
-    {
-        return false;
-    }
-
-    public boolean ValidMove(String from, String to)
-    {
-        int[] idxFromXY = new int[2], idxToXY = new int[2];
-        GetIndex(from, idxFromXY);
-        GetIndex(to, idxToXY);
-        int idxFromX, idxFromY, idxToX, idxToY;
-        idxFromX = idxFromXY[0];
-        idxFromY = idxFromXY[1];
-        idxToX = idxToXY[0];
-        idxToY = idxToXY[1];
-        return ValidMove(idxFromX, idxFromY, idxToX, idxToY);
     }
 
     // to change from index to string, use to print
