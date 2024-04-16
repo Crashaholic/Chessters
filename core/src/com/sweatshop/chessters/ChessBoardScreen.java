@@ -3,12 +3,8 @@ package com.sweatshop.chessters;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -17,28 +13,28 @@ public class ChessBoardScreen implements Screen
 {
     final ChesstersGame game;
     public ChessPiece[/*column*/][/*row*/] board;
-    private Rectangle bucket;
 
-    private Texture HlghtTile;
-    private Texture SlectTile;
+    private final Texture HlghtTile;
+    private final Texture SlectTile;
 
-    private Texture WhiteTile;
-    private Texture BlackTile;
+    private final Texture WhiteTile;
+    private final Texture BlackTile;
 
-    private Texture WhiteRook;
-    private Texture WhiteKing;
-    private Texture WhiteQuen;
-    private Texture WhiteBish;
-    private Texture WhiteKngt;
-    private Texture WhitePawn;
+    private final Texture WhiteRook;
+    private final Texture WhiteKing;
+    private final Texture WhiteQuen;
+    private final Texture WhiteBish;
+    private final Texture WhiteKngt;
+    private final Texture WhitePawn;
 
-    private Texture BlackRook;
-    private Texture BlackKing;
-    private Texture BlackQuen;
-    private Texture BlackBish;
-    private Texture BlackKngt;
-    private Texture BlackPawn;
+    private final Texture BlackRook;
+    private final Texture BlackKing;
+    private final Texture BlackQuen;
+    private final Texture BlackBish;
+    private final Texture BlackKngt;
+    private final Texture BlackPawn;
 
+    private ChessPiece.Team currentTurn;
 
     private int SelectedTileX;
     private int SelectedTileY;
@@ -50,13 +46,13 @@ public class ChessBoardScreen implements Screen
     {
         this.game = game;
 
+        currentTurn = ChessPiece.Team.WHITE;
+
         SelectedTileX = SelectedTileY = -1;
 
         camera = new OrthographicCamera();
         fitViewport = new FitViewport(600, 600);
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        bucket = new Rectangle();
 
         board = new ChessPiece[8][8];
 
@@ -147,6 +143,22 @@ public class ChessBoardScreen implements Screen
         board[7][6] = new ChessPiece(ChessPiece.Team.BLACK, ChessPiece.Piece_Type.PAWN);
     }
 
+    public boolean CheckBounds(float pointX, float pointY, float xMinBound, float xMaxBound, float yMinBound, float yMaxBound)
+    {
+        return (pointX >= xMinBound && pointX < xMaxBound &&
+                pointY >= yMinBound && pointY < yMaxBound);
+    }
+
+    public void HighlightTile(int x, int y)
+    {
+        game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+    }
+
+    public void HighlightBySelectedTileOffset(int xOffset, int yOffset)
+    {
+        HighlightTile(SelectedTileX + xOffset, SelectedTileY + yOffset);
+    }
+
     public boolean ValidMove()
     {
         return false;
@@ -171,9 +183,13 @@ public class ChessBoardScreen implements Screen
         camera.unproject(mousePos);
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            bucket.x -= 200 * dt;
+        {
+            //bucket.x -= 200 * dt;
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            bucket.x += 200 * dt;
+        {
+            //bucket.x += 200 * dt;
+        }
 
 
         ScreenUtils.clear(1, 1, 1, 1);
@@ -200,8 +216,9 @@ public class ChessBoardScreen implements Screen
                 // if the click pos is within this tile's boundary
                 // boundary is current tile's x to next tile's x
                 // and current tile's y to next tile's y
-                if (mousePos.x > x * 75 && mousePos.x <= (x + 1) * 75 &&
-                    mousePos.y > y * 75 && mousePos.y <= (y + 1) * 75)
+                //if (mousePos.x > x * 75 && mousePos.x <= (x + 1) * 75 &&
+                //    mousePos.y > y * 75 && mousePos.y <= (y + 1) * 75)
+                if (CheckBounds(mousePos.x, mousePos.y, x * 75, (x + 1) * 75, y * 75, (y + 1) * 75))
                 {
                     if (SelectedTileX != x || SelectedTileY != y)
                     {
@@ -296,6 +313,21 @@ public class ChessBoardScreen implements Screen
 
     @Override
     public void dispose() {
-
+        HlghtTile.dispose();
+        SlectTile.dispose();
+        WhiteTile.dispose();
+        BlackTile.dispose();
+        WhiteRook.dispose();
+        WhiteKing.dispose();
+        WhiteQuen.dispose();
+        WhiteBish.dispose();
+        WhiteKngt.dispose();
+        WhitePawn.dispose();
+        BlackRook.dispose();
+        BlackKing.dispose();
+        BlackQuen.dispose();
+        BlackBish.dispose();
+        BlackKngt.dispose();
+        BlackPawn.dispose();
     }
 }
