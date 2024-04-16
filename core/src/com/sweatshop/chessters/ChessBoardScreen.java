@@ -202,6 +202,10 @@ public class ChessBoardScreen implements Screen
                         SelectedTileY = y;
                     }
                     game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+                    //check if tile has a piece
+                    if (board[x][y] != null) {
+                        game.batch.draw(HlghtTile, x * 75, y * 75, 75, 75);
+                    }
                 }
 
                 if (board[x][y] != null)
