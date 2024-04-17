@@ -138,6 +138,11 @@ public class ChessBoardScreen implements Screen
     public void Move(int fromX, int fromY, int toX, int toY)
     {
         //TODO: THIS THANG
+
+        board[toX][toY] = board[fromX][fromY];
+        board[fromX][fromY] = null;
+        selectedTileX = selectedTileY = -1;
+
         if (!ValidMove(fromX, fromY, toX, toY))
         {
             if (currentTurn == ChessPiece.Team.WHITE)
@@ -160,33 +165,6 @@ public class ChessBoardScreen implements Screen
     {
         return false;
     }
-
-    /*Move from A1 to B4*/
-    public void Move(String from, String to)
-    {
-        int[] idxFromXY = new int[2], idxToXY = new int[2];
-        GetIndex(from, idxFromXY);
-        GetIndex(to, idxToXY);
-        int idxFromX, idxFromY, idxToX, idxToY;
-        idxFromX = idxFromXY[0];
-        idxFromY = idxFromXY[1];
-        idxToX = idxToXY[0];
-        idxToY = idxToXY[1];
-        Move(idxFromX, idxFromY, idxToX, idxToY);
-    }
-
-    public boolean ValidMove(String from, String to)
-    {
-        int[] idxFromXY = new int[2], idxToXY = new int[2];
-        GetIndex(from, idxFromXY);
-        GetIndex(to, idxToXY);
-        int idxFromX, idxFromY, idxToX, idxToY;
-        idxFromX = idxFromXY[0];
-        idxFromY = idxFromXY[1];
-        idxToX = idxToXY[0];
-        idxToY = idxToXY[1];
-        return ValidMove(idxFromX, idxFromY, idxToX, idxToY);
-    }
     
     public void Setup()
     {
@@ -197,6 +175,13 @@ public class ChessBoardScreen implements Screen
 
         currentTurn = ChessPiece.Team.WHITE;
         selectedTileX = selectedTileY = -1;
+        for (int x = 0; x < 8; x++)
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                board[x][y] = null;
+            }
+        }
 
         board[0][0] = new ChessPiece(ChessPiece.Team.WHITE, ChessPiece.Piece_Type.ROOK);
         board[1][0] = new ChessPiece(ChessPiece.Team.WHITE, ChessPiece.Piece_Type.KNIGHT);
@@ -420,7 +405,7 @@ public class ChessBoardScreen implements Screen
 
         if (Button(mousePos, "Next turn", 75 * 8, 70, 200, 50))
         {
-            Move("A1", "A2");
+            Move(0, 0, 0, 0);
         }
 
         if (selectedTileX >= 0 && selectedTileY >= 0) {
@@ -511,7 +496,15 @@ public class ChessBoardScreen implements Screen
                                 HighlightBySelectedTileOffset(0, 1);
                                 DrawText("W PAWN", 600, 380);
                                 if (selectedTileY == 1) {
-                                        HighlightBySelectedTileOffset(0, 2);
+                                    HighlightBySelectedTileOffset(0, 2);
+                                }
+                                if (CheckBounds(mousePos.x, mousePos.y,
+                                        selectedTileX * 75, (selectedTileX + 1) * 75 , (selectedTileY + 1) * 75, (selectedTileY + 2) * 75))
+                                {
+                                    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 1);
+                                    }
                                 }
                                 break;
                             default:
