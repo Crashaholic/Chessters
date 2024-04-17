@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import java.util.stream.IntStream;
 
 public class ChessBoardScreen implements Screen
 {
@@ -35,10 +34,18 @@ public class ChessBoardScreen implements Screen
     private final Texture blackKngt;
     private final Texture blackPawn;
 
+    private final Texture buttonTexture;
+
     private ChessPiece.Team currentTurn;
 
-    private int SelectedTileX;
-    private int SelectedTileY;
+    private int selectedTileX;
+    private int selectedTileY;
+
+    private ChessTiming globalTimer;
+    private ChessTiming whiteTimer;
+    private ChessTiming blackTimer;
+
+    private boolean gameStarted;
 
     OrthographicCamera camera;
     FitViewport fitViewport;
@@ -46,9 +53,6 @@ public class ChessBoardScreen implements Screen
     public ChessBoardScreen(final ChesstersGame game)
     {
         this.game = game;
-
-        currentTurn = ChessPiece.Team.WHITE;
-        SelectedTileX = SelectedTileY = -1;
 
         camera = new OrthographicCamera();
         fitViewport = new FitViewport(600, 600);
@@ -60,6 +64,11 @@ public class ChessBoardScreen implements Screen
         slectTile = new Texture(Gdx.files.internal("stile.png"));
         whiteTile = new Texture(Gdx.files.internal("wtile.png"));
         blackTile = new Texture(Gdx.files.internal("btile.png"));
+
+        hlghtTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        slectTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        whiteTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        blackTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         whiteRook = new Texture(Gdx.files.internal("wrook.png"));
         whiteKing = new Texture(Gdx.files.internal("wking.png"));
@@ -88,12 +97,31 @@ public class ChessBoardScreen implements Screen
         blackBish.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         blackKngt.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         blackPawn.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
+        buttonTexture = new Texture(Gdx.files.internal("button.png"));
+        buttonTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+    }
+
+    public void DrawText(String text, float x, float y)
+    {
+        game.font.draw(game.batch, text, x, y);
     }
 
     public boolean CheckBounds(float pointX, float pointY, float xMinBound, float xMaxBound, float yMinBound, float yMaxBound)
     {
         return (pointX >= xMinBound && pointX < xMaxBound &&
                 pointY >= yMinBound && pointY < yMaxBound);
+    }
+
+    public boolean Button(Vector3 mousePos, String text, float x, float y, float width, float height)
+    {
+        game.batch.draw(buttonTexture, x, y, width, height);
+        DrawText(text, x + 5, y + height / 1.5f);
+        if (CheckBounds(mousePos.x, mousePos.y, 75 * 8, 75 * 8 + 200, 10, 10 + 50))
+        {
+            return Gdx.input.isButtonJustPressed(Input.Buttons.LEFT);
+        }
+        return false;
     }
 
     /*turn A1 -> 0*/
@@ -105,11 +133,21 @@ public class ChessBoardScreen implements Screen
         xy[1] = yComponent;
     }
 
-
     /*TO WELLSON: USE THIS!!!*/
     public void Move(int fromX, int fromY, int toX, int toY)
     {
-
+        //TODO: THIS THANG
+        if (!ValidMove(fromX, fromY,toX,toY))
+        {
+            if (currentTurn == ChessPiece.Team.WHITE)
+            {
+                currentTurn = ChessPiece.Team.BLACK;
+            }
+            else
+            {
+                currentTurn = ChessPiece.Team.WHITE;
+            }
+        }
     }
 
     /*TO WELLSON: USE THIS!!!*/
@@ -147,6 +185,14 @@ public class ChessBoardScreen implements Screen
     
     public void Setup()
     {
+        globalTimer = new ChessTiming();
+        whiteTimer = new ChessTiming(300.f);
+        blackTimer = new ChessTiming(300.f);
+        gameStarted = false;
+
+        currentTurn = ChessPiece.Team.WHITE;
+        selectedTileX = selectedTileY = -1;
+
         board[0][0] = new ChessPiece(ChessPiece.Team.WHITE, ChessPiece.Piece_Type.ROOK);
         board[1][0] = new ChessPiece(ChessPiece.Team.WHITE, ChessPiece.Piece_Type.KNIGHT);
         board[2][0] = new ChessPiece(ChessPiece.Team.WHITE, ChessPiece.Piece_Type.BISHOP);
@@ -189,8 +235,10 @@ public class ChessBoardScreen implements Screen
 
     public void HighlightBySelectedTileOffset(int xOffset, int yOffset)
     {
-        if ((SelectedTileX + xOffset) < 8 && (SelectedTileY + yOffset) < 8 ) {
-        HighlightTile(SelectedTileX + xOffset, SelectedTileY + yOffset);
+        if (CheckBounds(selectedTileX + xOffset, selectedTileY + yOffset,
+                0, 8, 0, 8))
+        {
+            HighlightTile(selectedTileX + xOffset, selectedTileY + yOffset);
         }
     }
 
@@ -282,6 +330,7 @@ public class ChessBoardScreen implements Screen
         Vector3 mousePos = new Vector3();
         mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(mousePos);
+        globalTimer.Increment(dt);
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
         {
@@ -292,22 +341,20 @@ public class ChessBoardScreen implements Screen
             //bucket.x += 200 * dt;
         }
 
-
         ScreenUtils.clear(1, 1, 1, 1);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
         game.font.setColor(Color.BLACK);
-        game.font.draw(game.batch, "Current Selected", 600, 400);
-        //Gdx.app.log("Chessters", String.format("SelectedTile(X, Y): (%d, %d)", SelectedTileX, SelectedTileY));
+        DrawText("Current Selected", 600, 400);
+        DrawText("Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 600, 420);
         for (int y = 0; y < 8; ++y)
         {
             for (int x = 0; x < 8; ++x)
             {
-                if (SelectedTileX == x && SelectedTileY == y)
+                if (selectedTileX == x && selectedTileY == y)
                 {
-                    game.batch.draw(slectTile, SelectedTileX * 75, SelectedTileY * 75, 75, 75);
-                    //move logic
+                    game.batch.draw(slectTile, selectedTileX * 75, selectedTileY * 75, 75, 75);
                 }
                 else
                 {
@@ -321,38 +368,43 @@ public class ChessBoardScreen implements Screen
                 // and current tile's y to next tile's y
                 if (CheckBounds(mousePos.x, mousePos.y, x * 75, (x + 1) * 75, y * 75, (y + 1) * 75))
                 {
-                    if (SelectedTileX != x || SelectedTileY != y)
+                    if (selectedTileX != x || selectedTileY != y)
                     {
                         //check if tile has a piece
                         if (board[x][y] != null) {
                             game.batch.draw(hlghtTile, x * 75, y * 75, 75, 75);
-                            if (Gdx.input.isTouched())
+                            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
                             {
-                                SelectedTileX = x;
-                                SelectedTileY = y;
+                                selectedTileX = x;
+                                selectedTileY = y;
                             }
+                        }
+                    }
+                    else
+                    {
+                        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
+                        {
+                            selectedTileX = -1;
+                            selectedTileY = -1;
                         }
                     }
                 }
             }
         }
-        game.batch.draw(slectTile, 75 * 8, 10, 200, 50);
-        if (CheckBounds(mousePos.x, mousePos.y, 75 * 8, 75 * 8 + 200, 10, 10 + 50))
+
+        if (Button(mousePos, "Reset Game", 75 * 8, 10, 200, 50))
         {
-            if (Gdx.input.isTouched())
-            {
-                Gdx.app.log("Chessters", "Resetting!");
-                Setup();
-            }
+            Gdx.app.log("Chessters", "Resetting!");
+            Setup();
         }
-        if (SelectedTileX >= 0 && SelectedTileY >= 0)
-        {
-            if (board[SelectedTileX][SelectedTileY] != null) {
+
+        if (selectedTileX >= 0 && selectedTileY >= 0) {
+            if (board[selectedTileX][selectedTileY] != null) {
                 if(currentTurn == ChessPiece.Team.WHITE) {
-                    if (board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.WHITE) {
-                        switch (board[SelectedTileX][SelectedTileY].type) {
+                    if (board[selectedTileX][selectedTileY].team == ChessPiece.Team.WHITE) {
+                        switch (board[selectedTileX][selectedTileY].type) {
                             case BISHOP:
-                                game.font.draw(game.batch, "W BISHOP", 600, 380);
+                                DrawText("W BISHOP", 600, 380);
                                 for (int i = 0; i < 8; i++ ) {
                                     HighlightBySelectedTileOffset(i, i);
                                     HighlightBySelectedTileOffset(-i, -i);
@@ -362,39 +414,39 @@ public class ChessBoardScreen implements Screen
 
                                 break;
                             case KNIGHT:
-                                game.font.draw(game.batch, "W KNIGHT", 600, 380);
+                                DrawText("W KNIGHT", 600, 380);
 
-                                    HighlightBySelectedTileOffset(1, 2);
-                                    HighlightBySelectedTileOffset(-1, 2);
-                                    HighlightBySelectedTileOffset(1, -2);
-                                    HighlightBySelectedTileOffset(-1, -2);
-                                    HighlightBySelectedTileOffset(2, 1);
-                                    HighlightBySelectedTileOffset(2, -1);
-                                    HighlightBySelectedTileOffset(-2, 1);
-                                    HighlightBySelectedTileOffset(-2, -1);
+                                HighlightBySelectedTileOffset(1, 2);
+                                HighlightBySelectedTileOffset(-1, 2);
+                                HighlightBySelectedTileOffset(1, -2);
+                                HighlightBySelectedTileOffset(-1, -2);
+                                HighlightBySelectedTileOffset(2, 1);
+                                HighlightBySelectedTileOffset(2, -1);
+                                HighlightBySelectedTileOffset(-2, 1);
+                                HighlightBySelectedTileOffset(-2, -1);
 
                                 break;
                             case KING:
-                                game.font.draw(game.batch, "W KING", 600, 380);
+                                DrawText("W KING", 600, 380);
                                 break;
                             case QUEEN:
-                                game.font.draw(game.batch, "W QUEEN", 600, 380);
+                                DrawText("W QUEEN", 600, 380);
                                 break;
                             case ROOK:
-                                game.font.draw(game.batch, "W ROOK", 600, 380);
+                                DrawText("W ROOK", 600, 380);
                                 for (int i = 0; i < 8; i++ ) {
-                                        if (board[SelectedTileX][i] == null) {
+                                        if (board[selectedTileX][i] == null) {
                                             HighlightBySelectedTileOffset(0, i);
                                         }
-                                        if (board[i][SelectedTileY] == null) {
+                                        if (board[i][selectedTileY] == null) {
                                             HighlightBySelectedTileOffset(i, 0);
                                         }
                                 }
                                 break;
                             case PAWN:
                                 HighlightBySelectedTileOffset(0, 1);
-                                game.font.draw(game.batch, "W PAWN", 600, 380);
-                                if (SelectedTileY == 1) {
+                                DrawText("W PAWN", 600, 380);
+                                if (selectedTileY == 1) {
                                         HighlightBySelectedTileOffset(0, 2);
                                 }
                                 break;
@@ -403,25 +455,25 @@ public class ChessBoardScreen implements Screen
                         }
 
                     }
-                    else if(board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.BLACK) {
-                        switch (board[SelectedTileX][SelectedTileY].type) {
+                    else if(board[selectedTileX][selectedTileY].team == ChessPiece.Team.BLACK) {
+                        switch (board[selectedTileX][selectedTileY].type) {
                             case BISHOP:
-                                game.font.draw(game.batch, "B BISHOP", 600, 380);
+                                DrawText("B BISHOP", 600, 380);
                                 break;
                             case KNIGHT:
-                                game.font.draw(game.batch, "B KNIGHT", 600, 380);
+                                DrawText("B KNIGHT", 600, 380);
                                 break;
                             case KING:
-                                game.font.draw(game.batch, "B KING", 600, 380);
+                                DrawText("B KING", 600, 380);
                                 break;
                             case QUEEN:
-                                game.font.draw(game.batch, "B QUEEN", 600, 380);
+                                DrawText("B QUEEN", 600, 380);
                                 break;
                             case ROOK:
-                                game.font.draw(game.batch, "B ROOK", 600, 380);
+                                DrawText("B ROOK", 600, 380);
                                 break;
                             case PAWN:
-                                game.font.draw(game.batch, "B PAWN", 600, 380);
+                                DrawText("B PAWN", 600, 380);
                                 break;
                             default:
                                 break;
@@ -429,52 +481,52 @@ public class ChessBoardScreen implements Screen
                     }
                 }
                 else {
-                    if (board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.WHITE) {
-                        switch (board[SelectedTileX][SelectedTileY].type) {
+                    if (board[selectedTileX][selectedTileY].team == ChessPiece.Team.WHITE) {
+                        switch (board[selectedTileX][selectedTileY].type) {
                             case BISHOP:
-                                game.font.draw(game.batch, "W BISHOP", 600, 380);
+                                DrawText("W BISHOP", 600, 380);
                                 break;
                             case KNIGHT:
-                                game.font.draw(game.batch, "W KNIGHT", 600, 380);
+                                DrawText("W KNIGHT", 600, 380);
                                 break;
                             case KING:
-                                game.font.draw(game.batch, "W KING", 600, 380);
+                                DrawText("W KING", 600, 380);
                                 break;
                             case QUEEN:
-                                game.font.draw(game.batch, "W QUEEN", 600, 380);
+                                DrawText("W QUEEN", 600, 380);
                                 break;
                             case ROOK:
-                                game.font.draw(game.batch, "W ROOK", 600, 380);
+                                DrawText("W ROOK", 600, 380);
                                 break;
                             case PAWN:
-                                game.font.draw(game.batch, "W PAWN", 600, 380);
+                                DrawText("W PAWN", 600, 380);
                                 break;
                             default:
                                 break;
                         }
 
                     }
-                    else if(board[SelectedTileX][SelectedTileY].team == ChessPiece.Team.BLACK) {
-                        switch (board[SelectedTileX][SelectedTileY].type) {
+                    else if(board[selectedTileX][selectedTileY].team == ChessPiece.Team.BLACK) {
+                        switch (board[selectedTileX][selectedTileY].type) {
                             case BISHOP:
-                                game.font.draw(game.batch, "B BISHOP", 600, 380);
+                                DrawText("B BISHOP", 600, 380);
                                 break;
                             case KNIGHT:
-                                game.font.draw(game.batch, "B KNIGHT", 600, 380);
+                                DrawText("B KNIGHT", 600, 380);
                                 break;
                             case KING:
-                                game.font.draw(game.batch, "B KING", 600, 380);
+                                DrawText("B KING", 600, 380);
                                 break;
                             case QUEEN:
-                                game.font.draw(game.batch, "B QUEEN", 600, 380);
+                                DrawText("B QUEEN", 600, 380);
                                 break;
                             case ROOK:
-                                game.font.draw(game.batch, "B ROOK", 600, 380);
+                                DrawText("B ROOK", 600, 380);
                                 break;
                             case PAWN:
                                 HighlightBySelectedTileOffset(0, -1);
-                                game.font.draw(game.batch, "B PAWN", 600, 380);
-                                if (SelectedTileY == 6) {
+                                DrawText("B PAWN", 600, 380);
+                                if (selectedTileY == 6) {
                                     HighlightBySelectedTileOffset(0, -2);
                                 }
                                 break;
@@ -486,8 +538,8 @@ public class ChessBoardScreen implements Screen
 
 
             }
-            String str = ConvertIndexToString(SelectedTileX, SelectedTileY);
-            game.font.draw(game.batch,"Selected: " + str, 600, 350);
+            String str = ConvertIndexToString(selectedTileX, selectedTileY);
+            DrawText("Selected: " + str, 600, 350);
         }
         game.batch.end();
 
@@ -497,7 +549,7 @@ public class ChessBoardScreen implements Screen
     }
 
     @Override
-    public void resize(int i, int i1) {
+    public void resize(int x, int y) {
 
     }
 
