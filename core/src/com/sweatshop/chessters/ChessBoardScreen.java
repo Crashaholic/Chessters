@@ -407,7 +407,7 @@ public class ChessBoardScreen implements Screen
                         switch (board[selectedTileX][selectedTileY].type) {
                             case BISHOP:
                                 DrawText("W BISHOP", 600, 380);
-                                for (int i = 0; i < 8; i++ ) {
+                                for (int i = 1; i < 8; i++ ) {
                                     HighlightBySelectedTileOffset(i, i);
                                     HighlightBySelectedTileOffset(-i, -i);
                                     HighlightBySelectedTileOffset(i, -i);
@@ -418,35 +418,50 @@ public class ChessBoardScreen implements Screen
                             case KNIGHT:
                                 DrawText("W KNIGHT", 600, 380);
                                 game.font.draw(game.batch, "W KNIGHT", 600, 380);
-                                if (((selectedTileX + 1) < 8) && ((selectedTileY + 2) < 8 )) {
-                                    if (board[selectedTileX+1][selectedTileY+2] == null)
+                                if (CheckBounds(selectedTileX + 1, selectedTileY + 2,
+                                        0, 8, 0, 8)) {
+                                    if (board[selectedTileX + 1][selectedTileY + 2] == null)
                                         HighlightBySelectedTileOffset(1, 2);
                                 }
-                                if (((selectedTileX - 1) < 8) && ((selectedTileY + 2) < 8) ) {
-                                    if (board[selectedTileX-1][selectedTileY+2] == null)
+
+                                if (CheckBounds(selectedTileX - 1, selectedTileY + 2,
+                                        0, 8, 0, 8)) {
+                                    if (board[selectedTileX - 1][selectedTileY + 2] == null)
                                         HighlightBySelectedTileOffset(-1, 2);
                                 }
-                                if (((selectedTileX + 1) < 8) && ((selectedTileY - 2) < 8) ) {
+
+                                if (CheckBounds(selectedTileX + 1, selectedTileY - 2,
+                                        0, 8, 0, 8)) {
                                     if (board[selectedTileX+1][selectedTileY-2] == null)
                                         HighlightBySelectedTileOffset(1, -2);
                                 }
-                                if (((selectedTileX - 1) < 8) && ((selectedTileY - 2) < 8 )) {
+
+                                if (CheckBounds(selectedTileX - 1, selectedTileY - 2,
+                                        0, 8, 0, 8)) {
                                     if (board[selectedTileX-1][selectedTileY-2] == null)
                                         HighlightBySelectedTileOffset(-1, -2);
                                 }
-                                if (((selectedTileX + 2) < 8) && ((selectedTileY + 1) < 8 )) {
+
+                                if (CheckBounds(selectedTileX + 2, selectedTileY + 1,
+                                        0, 8, 0, 8)) {
                                     if (board[selectedTileX+2][selectedTileY+1] == null)
                                         HighlightBySelectedTileOffset(2, 1);
                                 }
-                                if (((selectedTileX + 2) < 8) && ((selectedTileY - 1) < 8 )) {
+
+                                if (CheckBounds(selectedTileX + 2, selectedTileY - 1,
+                                        0, 8, 0, 8)) {
                                     if (board[selectedTileX+2][selectedTileY-1] == null)
                                         HighlightBySelectedTileOffset(2, -1);
                                 }
-                                if (((selectedTileX - 2) < 8) && ((selectedTileY + 1) < 8 )) {
+
+                                if (CheckBounds(selectedTileX - 2, selectedTileY + 1,
+                                        0, 8, 0, 8)) {
                                     if (board[selectedTileX-2][selectedTileY+1] == null)
                                         HighlightBySelectedTileOffset(-2, 1);
                                 }
-                                if (((selectedTileX - 2) < 8) && ((selectedTileY - 1) < 8 )) {
+
+                                if (CheckBounds(selectedTileX - 2, selectedTileY - 1,
+                                        0, 8, 0, 8)) {
                                     if (board[selectedTileX-2][selectedTileY-1] == null)
                                         HighlightBySelectedTileOffset(-2, -1);
                                 }
