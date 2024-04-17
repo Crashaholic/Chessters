@@ -133,6 +133,7 @@ public class ChessBoardScreen implements Screen
         xy[1] = yComponent;
     }
 
+
     /*TO WELLSON: USE THIS!!!*/
     public void Move(int fromX, int fromY, int toX, int toY)
     {
@@ -341,6 +342,7 @@ public class ChessBoardScreen implements Screen
             //bucket.x += 200 * dt;
         }
 
+
         ScreenUtils.clear(1, 1, 1, 1);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
@@ -415,15 +417,39 @@ public class ChessBoardScreen implements Screen
                                 break;
                             case KNIGHT:
                                 DrawText("W KNIGHT", 600, 380);
-
-                                HighlightBySelectedTileOffset(1, 2);
-                                HighlightBySelectedTileOffset(-1, 2);
-                                HighlightBySelectedTileOffset(1, -2);
-                                HighlightBySelectedTileOffset(-1, -2);
-                                HighlightBySelectedTileOffset(2, 1);
-                                HighlightBySelectedTileOffset(2, -1);
-                                HighlightBySelectedTileOffset(-2, 1);
-                                HighlightBySelectedTileOffset(-2, -1);
+                                game.font.draw(game.batch, "W KNIGHT", 600, 380);
+                                if (((selectedTileX + 1) < 8) && ((selectedTileY + 2) < 8 )) {
+                                    if (board[selectedTileX+1][selectedTileY+2] == null)
+                                        HighlightBySelectedTileOffset(1, 2);
+                                }
+                                if (((selectedTileX - 1) < 8) && ((selectedTileY + 2) < 8) ) {
+                                    if (board[selectedTileX-1][selectedTileY+2] == null)
+                                        HighlightBySelectedTileOffset(-1, 2);
+                                }
+                                if (((selectedTileX + 1) < 8) && ((selectedTileY - 2) < 8) ) {
+                                    if (board[selectedTileX+1][selectedTileY-2] == null)
+                                        HighlightBySelectedTileOffset(1, -2);
+                                }
+                                if (((selectedTileX - 1) < 8) && ((selectedTileY - 2) < 8 )) {
+                                    if (board[selectedTileX-1][selectedTileY-2] == null)
+                                        HighlightBySelectedTileOffset(-1, -2);
+                                }
+                                if (((selectedTileX + 2) < 8) && ((selectedTileY + 1) < 8 )) {
+                                    if (board[selectedTileX+2][selectedTileY+1] == null)
+                                        HighlightBySelectedTileOffset(2, 1);
+                                }
+                                if (((selectedTileX + 2) < 8) && ((selectedTileY - 1) < 8 )) {
+                                    if (board[selectedTileX+2][selectedTileY-1] == null)
+                                        HighlightBySelectedTileOffset(2, -1);
+                                }
+                                if (((selectedTileX - 2) < 8) && ((selectedTileY + 1) < 8 )) {
+                                    if (board[selectedTileX-2][selectedTileY+1] == null)
+                                        HighlightBySelectedTileOffset(-2, 1);
+                                }
+                                if (((selectedTileX - 2) < 8) && ((selectedTileY - 1) < 8 )) {
+                                    if (board[selectedTileX-2][selectedTileY-1] == null)
+                                        HighlightBySelectedTileOffset(-2, -1);
+                                }
 
                                 break;
                             case KING:
