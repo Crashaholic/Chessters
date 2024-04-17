@@ -42,9 +42,9 @@ public class ChessBoardScreen implements Screen
     private int selectedTileX;
     private int selectedTileY;
 
-    private ChessTiming globalTimer;
-    private ChessTiming whiteTimer;
-    private ChessTiming blackTimer;
+    private final ChessTiming globalTimer;
+    private final ChessTiming whiteTimer;
+    private final ChessTiming blackTimer;
 
     private boolean gameStarted;
 
@@ -130,6 +130,27 @@ public class ChessBoardScreen implements Screen
             return Gdx.input.isButtonJustPressed(Input.Buttons.LEFT);
         }
         return false;
+    }
+
+    public boolean ClickedTile(Vector3 mousePos, int tileX, int tileY)
+    {
+        if (CheckBounds(mousePos.x, mousePos.y,
+                tileX * 75, (tileX + 1) * 75 , tileY * 75, (tileY + 1) * 75))
+        {
+            return Gdx.input.isButtonJustPressed(Input.Buttons.LEFT);
+        }
+        return false;
+    }
+
+    public void ResetSelection()
+    {
+        selectedTileX = selectedTileY = -1;
+    }
+
+    public boolean ClickedHighlightedTile(Vector3 mousePos, int tileX, int tileY)
+    {
+        HighlightTile(tileX, tileY);
+        return ClickedTile(mousePos, tileX, tileY);
     }
 
     /*turn A1 -> 0*/
@@ -357,10 +378,31 @@ public class ChessBoardScreen implements Screen
         game.batch.begin();
         game.batch.draw(sideboardTexture, 600, 0, 200, 600);
         game.font.setColor(Color.BLACK);
-        DrawText("Current Selected", 600, 400);
-        DrawText("Game Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 600, 420);
-        DrawText("White Timer: " + whiteTimer.GetMinutesString() + ":" + whiteTimer.GetSecondsString(), 600, 320);
-        DrawText("Black Timer: " + blackTimer.GetMinutesString() + ":" + blackTimer.GetSecondsString(), 600, 520);
+        String str = "";
+        if (selectedTileX >= 0 && selectedTileY >= 0)
+            str = ConvertIndexToString(selectedTileX, selectedTileY);
+        DrawText("Current Selected: " + str, 630, 400);
+        DrawText("Game Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 630, 420);
+        DrawText("White Timer: " + whiteTimer.GetMinutesString() + ":" + whiteTimer.GetSecondsString(), 630, 320);
+        DrawText("Black Timer: " + blackTimer.GetMinutesString() + ":" + blackTimer.GetSecondsString(), 630, 520);
+        if (currentTurn == ChessPiece.Team.WHITE)
+        {
+            Vector3 scale = new Vector3(game.font.getData().scaleX, game.font.getData().scaleY, 0);
+            game.font.getData().setScale(scale.x + 1, scale.y + 1);
+            game.font.setColor(Color.WHITE);
+            DrawText("White's Turn", 610, 250);
+            game.font.getData().setScale(scale.x, scale.y);
+        }
+        else
+        {
+            Vector3 scale = new Vector3(game.font.getData().scaleX, game.font.getData().scaleY, 0);
+            game.font.getData().setScale(scale.x + 1, scale.y + 1);
+            game.font.setColor(Color.BLACK);
+            DrawText("Black's Turn", 610, 250);
+            game.font.getData().setScale(scale.x, scale.y);
+        }
+        game.font.setColor(Color.BLACK);
+
         for (int y = 0; y < 8; ++y)
         {
             for (int x = 0; x < 8; ++x)
@@ -407,13 +449,13 @@ public class ChessBoardScreen implements Screen
         game.batch.end();
         game.batch.begin();
 
-        if (Button(mousePos, "Reset Game", 75 * 8, 10, 200, 50))
+        if (Button(mousePos, "Reset Game", 75 * 8 + 10, 30, 180, 50))
         {
             Gdx.app.log("Chessters", "Resetting!");
             Setup();
         }
 
-        if (Button(mousePos, "Next turn", 75 * 8, 70, 200, 50))
+        if (Button(mousePos, "Next turn", 75 * 8 + 10, 80, 180, 50))
         {
             Move(0, 0, 0, 0);
         }
@@ -493,125 +535,90 @@ public class ChessBoardScreen implements Screen
                                 break;
                             case ROOK:
                                 DrawText("W ROOK", 600, 380);
-                                /*y side*/
-//                                for (int i = selectedTileY; i < 8; i++) {
-//                                    if (i == selectedTileY)
-//                                        continue;
-//                                    if (board[selectedTileX][i] == null) {
-//                                        HighlightBySelectedTileOffset(0, i);
-//                                        if (CheckBounds(mousePos.x, mousePos.y,
-//                                                selectedTileX * 75, (selectedTileX + 1) * 75 , i * 75, (i + 1) * 75))
-//                                        {
-//                                            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
-//                                            {
-//                                                Move(selectedTileX, selectedTileY, selectedTileX, i);
-//                                                //break;
-//                                            }
-//                                        }
-//                                    }
-//                                    else {
-//                                        break;
-//                                    }
-//                                }
-
+                                boolean hasMoved = false;
+                                /*y side upwards check*/
                                 for (int i = selectedTileY; i < 8; i++)
                                 {
                                     if (i == selectedTileY)
                                         continue;
                                     if (board[selectedTileX][i] == null)
                                     {
-                                        HighlightBySelectedTileOffset(0, i - selectedTileY);
-                                        if (CheckBounds(mousePos.x, mousePos.y,
-                                                selectedTileX * 75, (selectedTileX + 1) * 75 , i * 75, (i + 1) * 75))
+                                        if (ClickedHighlightedTile(mousePos, selectedTileX, i))
                                         {
-                                            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
-                                            {
-                                                Move(selectedTileX, selectedTileY, selectedTileX, i);
-                                            }
+                                            Move(selectedTileX, selectedTileY, selectedTileX, i);
+                                            hasMoved = true;
                                         }
                                     }
                                     else break;
                                 }
+                                /*y side downwards check*/
                                 for (int i = selectedTileY; i >= 0; i--)
                                 {
                                     if (i == selectedTileY)
                                         continue;
                                     if (board[selectedTileX][i] == null)
                                     {
-                                        HighlightBySelectedTileOffset(0, -(selectedTileY - i));
-                                        if (CheckBounds(mousePos.x, mousePos.y,
-                                                selectedTileX * 75, (selectedTileX + 1) * 75 , i * 75, (i + 1) * 75))
+                                        if (ClickedHighlightedTile(mousePos, selectedTileX, i))
                                         {
-                                            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
-                                            {
-                                                Move(selectedTileX, selectedTileY, selectedTileX, i);
-                                            }
+                                            Move(selectedTileX, selectedTileY, selectedTileX, i);
+                                            hasMoved = true;
                                         }
                                     }
                                     else break;
                                 }
 
-                                /*x side*/
+                                /*x side rightwards check*/
                                 for (int i = selectedTileX; i < 8; i++)
                                 {
                                     if (i == selectedTileX)
                                         continue;
                                     if (board[i][selectedTileY] == null)
                                     {
-                                        HighlightBySelectedTileOffset(i - selectedTileX, 0);
-                                        if (CheckBounds(mousePos.x, mousePos.y,
-                                                i * 75, (i + 1) * 75 , selectedTileY * 75, (selectedTileY + 1) * 75))
+                                        if (ClickedHighlightedTile(mousePos, i, selectedTileY))
                                         {
-                                            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
-                                            {
-                                                Move(selectedTileX, selectedTileY, i, selectedTileY);
-                                            }
+                                            Move(selectedTileX, selectedTileY, i, selectedTileY);
+                                            hasMoved = true;
                                         }
                                     }
                                     else break;
                                 }
+                                /*x side leftwards check*/
                                 for (int i = selectedTileX; i >= 0; i--)
                                 {
                                     if (i == selectedTileX)
                                         continue;
                                     if (board[i][selectedTileY] == null)
                                     {
-                                        HighlightBySelectedTileOffset(-(i + 1), 0);
-                                        if (CheckBounds(mousePos.x, mousePos.y,
-                                                i * 75, (i + 1) * 75 , selectedTileY * 75, (selectedTileY + 1) * 75))
+                                        if (ClickedHighlightedTile(mousePos, i, selectedTileY))
                                         {
-                                            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
-                                            {
-                                                Move(selectedTileX, selectedTileY, i, selectedTileY);
-                                            }
+                                            Move(selectedTileX, selectedTileY, i, selectedTileY);
+                                            hasMoved = true;
                                         }
                                     }
                                     else break;
                                 }
+                                if (hasMoved)
+                                {
+                                    ResetSelection();
+                                }
                                 break;
                             case PAWN:
-                                HighlightBySelectedTileOffset(0, 1);
                                 DrawText("W PAWN", 600, 380);
-                                if (selectedTileY == 1) {
-                                    HighlightBySelectedTileOffset(0, 2);
-                                    if (CheckBounds(mousePos.x, mousePos.y,
-                                            selectedTileX * 75, (selectedTileX + 1) * 75 , (selectedTileY + 2) * 75, (selectedTileY + 3) * 75))
+                                if (selectedTileY == 1)
+                                {
+                                    if (board[selectedTileX][selectedTileY + 1] == null)
                                     {
-                                        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
+                                        if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY + 2))
                                         {
                                             Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 2);
-                                            selectedTileX = selectedTileY = -1;
+                                            ResetSelection();
                                         }
                                     }
                                 }
-                                if (CheckBounds(mousePos.x, mousePos.y,
-                                        selectedTileX * 75, (selectedTileX + 1) * 75 , (selectedTileY + 1) * 75, (selectedTileY + 2) * 75))
+                                if (ClickedHighlightedTile(mousePos, selectedTileX, (selectedTileY + 1)))
                                 {
-                                    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
-                                    {
-                                        Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 1);
-                                        selectedTileX = selectedTileY = -1;
-                                    }
+                                    Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 1);
+                                    ResetSelection();
                                 }
                                 break;
                             default:
@@ -702,14 +709,25 @@ public class ChessBoardScreen implements Screen
 
 
             }
-            String str = ConvertIndexToString(selectedTileX, selectedTileY);
-            DrawText("Selected: " + str, 600, 350);
         }
         game.batch.end();
 
         game.pieceBatch.begin();
         DrawChessPieces();
         game.pieceBatch.end();
+
+        game.batch.begin();
+        game.font.setColor(Color.WHITE);
+        for (int y = 0; y < 8; ++y)
+        {
+            for (int x = 0; x < 8; ++x)
+            {
+                DrawText("" + (char)('A' + (char)x), (x * 75.f) + 32.5f, 12);
+            }
+            DrawText("" + (y + 1), 3, (y * 75.f) + 42.5f);
+        }
+        game.font.setColor(Color.BLACK);
+        game.batch.end();
     }
 
     @Override
