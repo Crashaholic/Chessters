@@ -363,15 +363,38 @@ public class ChessBoardScreen implements Screen
                                 break;
                             case KNIGHT:
                                 game.font.draw(game.batch, "W KNIGHT", 600, 380);
-
-                                    HighlightBySelectedTileOffset(1, 2);
-                                    HighlightBySelectedTileOffset(-1, 2);
-                                    HighlightBySelectedTileOffset(1, -2);
-                                    HighlightBySelectedTileOffset(-1, -2);
-                                    HighlightBySelectedTileOffset(2, 1);
-                                    HighlightBySelectedTileOffset(2, -1);
-                                    HighlightBySelectedTileOffset(-2, 1);
-                                    HighlightBySelectedTileOffset(-2, -1);
+                                if (((SelectedTileX + 1) < 8) && ((SelectedTileY + 2) < 8 )) {
+                                    if (board[SelectedTileX+1][SelectedTileY+2] == null)
+                                        HighlightBySelectedTileOffset(1, 2);
+                                }
+                                if (((SelectedTileX - 1) < 8) && ((SelectedTileY + 2) < 8) ) {
+                                    if (board[SelectedTileX-1][SelectedTileY+2] == null)
+                                        HighlightBySelectedTileOffset(-1, 2);
+                                }
+                                if (((SelectedTileX + 1) < 8) && ((SelectedTileY - 2) < 8) ) {
+                                    if (board[SelectedTileX+1][SelectedTileY-2] == null)
+                                        HighlightBySelectedTileOffset(1, -2);
+                                }
+                                if (((SelectedTileX - 1) < 8) && ((SelectedTileY - 2) < 8 )) {
+                                    if (board[SelectedTileX-1][SelectedTileY-2] == null)
+                                        HighlightBySelectedTileOffset(-1, -2);
+                                }
+                                if (((SelectedTileX + 2) < 8) && ((SelectedTileY + 1) < 8 )) {
+                                    if (board[SelectedTileX+2][SelectedTileY+1] == null)
+                                        HighlightBySelectedTileOffset(2, 1);
+                                }
+                                if (((SelectedTileX + 2) < 8) && ((SelectedTileY - 1) < 8 )) {
+                                    if (board[SelectedTileX+2][SelectedTileY-1] == null)
+                                        HighlightBySelectedTileOffset(2, -1);
+                                }
+                                if (((SelectedTileX - 2) < 8) && ((SelectedTileY + 1) < 8 )) {
+                                    if (board[SelectedTileX-2][SelectedTileY+1] == null)
+                                        HighlightBySelectedTileOffset(-2, 1);
+                                }
+                                if (((SelectedTileX - 2) < 8) && ((SelectedTileY - 1) < 8 )) {
+                                    if (board[SelectedTileX-2][SelectedTileY-1] == null)
+                                        HighlightBySelectedTileOffset(-2, -1);
+                                }
 
                                 break;
                             case KING:
