@@ -149,7 +149,6 @@ public class ChessBoardScreen implements Screen
 
         board[toX][toY] = board[fromX][fromY];
         board[fromX][fromY] = null;
-        selectedTileX = selectedTileY = -1;
 
         if (!ValidMove(fromX, fromY, toX, toY))
         {
@@ -492,13 +491,43 @@ public class ChessBoardScreen implements Screen
                                 break;
                             case ROOK:
                                 DrawText("W ROOK", 600, 380);
-                                for (int i = 0; i < 8; i++ ) {
-                                        if (board[selectedTileX][i] == null) {
-                                            HighlightBySelectedTileOffset(0, i);
+                                /*y side*/
+                                for (int i = selectedTileY; i < 8; i++) {
+                                    if (i == selectedTileY)
+                                        continue;
+                                    if (board[selectedTileX][i] == null) {
+                                        HighlightBySelectedTileOffset(0, i);
+                                        if (CheckBounds(mousePos.x, mousePos.y,
+                                                selectedTileX * 75, (selectedTileX + 1) * 75 , i * 75, (i + 1) * 75))
+                                        {
+                                            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
+                                            {
+                                                Move(selectedTileX, selectedTileY, selectedTileX, i);
+                                                //break;
+                                            }
                                         }
-                                        if (board[i][selectedTileY] == null) {
-                                            HighlightBySelectedTileOffset(i, 0);
+                                    }
+                                    else {
+                                        break;
+                                    }
+                                }
+                                /*x side*/
+                                for (int i = 1; i < 8; i++) {
+                                    if (board[i][selectedTileY] == null) {
+                                        HighlightBySelectedTileOffset(i, 0);
+                                        if (CheckBounds(mousePos.x, mousePos.y,
+                                                (selectedTileX + i) * 75, (selectedTileX + i + 1) * 75 , selectedTileY * 75, (selectedTileY + 1) * 75))
+                                        {
+                                            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
+                                            {
+                                                Move(selectedTileX, selectedTileY, selectedTileX + i, selectedTileY);
+                                                //break;
+                                            }
                                         }
+                                    }
+                                    else {
+                                        break;
+                                    }
                                 }
                                 break;
                             case PAWN:
@@ -506,6 +535,15 @@ public class ChessBoardScreen implements Screen
                                 DrawText("W PAWN", 600, 380);
                                 if (selectedTileY == 1) {
                                     HighlightBySelectedTileOffset(0, 2);
+                                    if (CheckBounds(mousePos.x, mousePos.y,
+                                            selectedTileX * 75, (selectedTileX + 1) * 75 , (selectedTileY + 2) * 75, (selectedTileY + 3) * 75))
+                                    {
+                                        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
+                                        {
+                                            Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 2);
+                                            selectedTileX = selectedTileY = -1;
+                                        }
+                                    }
                                 }
                                 if (CheckBounds(mousePos.x, mousePos.y,
                                         selectedTileX * 75, (selectedTileX + 1) * 75 , (selectedTileY + 1) * 75, (selectedTileY + 2) * 75))
@@ -513,6 +551,7 @@ public class ChessBoardScreen implements Screen
                                     if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT))
                                     {
                                         Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 1);
+                                        selectedTileX = selectedTileY = -1;
                                     }
                                 }
                                 break;
