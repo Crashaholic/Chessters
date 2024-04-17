@@ -35,6 +35,7 @@ public class ChessBoardScreen implements Screen
     private final Texture blackPawn;
 
     private final Texture buttonTexture;
+    private final Texture sideboardTexture;
 
     private ChessPiece.Team currentTurn;
 
@@ -53,6 +54,10 @@ public class ChessBoardScreen implements Screen
     public ChessBoardScreen(final ChesstersGame game)
     {
         this.game = game;
+
+        globalTimer = new ChessTiming();
+        whiteTimer = new ChessTiming();
+        blackTimer = new ChessTiming();
 
         camera = new OrthographicCamera();
         fitViewport = new FitViewport(600, 600);
@@ -100,6 +105,9 @@ public class ChessBoardScreen implements Screen
 
         buttonTexture = new Texture(Gdx.files.internal("button.png"));
         buttonTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
+        sideboardTexture = new Texture(Gdx.files.internal("sideboard.png"));
+        sideboardTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
     }
 
     public void DrawText(String text, float x, float y)
@@ -168,9 +176,9 @@ public class ChessBoardScreen implements Screen
     
     public void Setup()
     {
-        globalTimer = new ChessTiming();
-        whiteTimer = new ChessTiming(300.f);
-        blackTimer = new ChessTiming(300.f);
+        globalTimer.Set(0.0f);
+        whiteTimer.Set(300.f);
+        blackTimer.Set(300.f);
         gameStarted = false;
 
         currentTurn = ChessPiece.Team.WHITE;
@@ -348,6 +356,7 @@ public class ChessBoardScreen implements Screen
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
+        game.batch.draw(sideboardTexture, 600, 0, 200, 600);
         game.font.setColor(Color.BLACK);
         DrawText("Current Selected", 600, 400);
         DrawText("Game Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 600, 420);
