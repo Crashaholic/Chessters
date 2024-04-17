@@ -538,7 +538,7 @@ public class ChessBoardScreen implements Screen
                                         continue;
                                     if (board[selectedTileX][i] == null)
                                     {
-                                        HighlightBySelectedTileOffset(0, -(i + 1));
+                                        HighlightBySelectedTileOffset(0, -(selectedTileY - i));
                                         if (CheckBounds(mousePos.x, mousePos.y,
                                                 selectedTileX * 75, (selectedTileX + 1) * 75 , i * 75, (i + 1) * 75))
                                         {
