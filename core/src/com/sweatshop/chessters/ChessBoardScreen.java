@@ -117,7 +117,7 @@ public class ChessBoardScreen implements Screen
     {
         game.batch.draw(buttonTexture, x, y, width, height);
         DrawText(text, x + 5, y + height / 1.5f);
-        if (CheckBounds(mousePos.x, mousePos.y, 75 * 8, 75 * 8 + 200, 10, 10 + 50))
+        if (CheckBounds(mousePos.x, mousePos.y, x, x + width, y, y + height))
         {
             return Gdx.input.isButtonJustPressed(Input.Buttons.LEFT);
         }
@@ -138,10 +138,14 @@ public class ChessBoardScreen implements Screen
     public void Move(int fromX, int fromY, int toX, int toY)
     {
         //TODO: THIS THANG
-        if (!ValidMove(fromX, fromY,toX,toY))
+        if (!ValidMove(fromX, fromY, toX, toY))
         {
             if (currentTurn == ChessPiece.Team.WHITE)
             {
+                if (!gameStarted)
+                {
+                    gameStarted = true;
+                }
                 currentTurn = ChessPiece.Team.BLACK;
             }
             else
@@ -331,16 +335,28 @@ public class ChessBoardScreen implements Screen
         Vector3 mousePos = new Vector3();
         mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(mousePos);
-        globalTimer.Increment(dt);
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+        if (gameStarted)
         {
+            if (currentTurn == ChessPiece.Team.WHITE)
+            {
+                whiteTimer.Decrement(dt);
+            }
+            else
+            {
+                blackTimer.Decrement(dt);
+            }
+            globalTimer.Increment(dt);
+        }
+
+        //if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+        //{
             //bucket.x -= 200 * dt;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-        {
+        //}
+        //if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+        //{
             //bucket.x += 200 * dt;
-        }
+        //}
 
 
         ScreenUtils.clear(1, 1, 1, 1);
@@ -349,7 +365,9 @@ public class ChessBoardScreen implements Screen
         game.batch.begin();
         game.font.setColor(Color.BLACK);
         DrawText("Current Selected", 600, 400);
-        DrawText("Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 600, 420);
+        DrawText("Game Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 600, 420);
+        DrawText("White Timer: " + whiteTimer.GetMinutesString() + ":" + whiteTimer.GetSecondsString(), 600, 320);
+        DrawText("Black Timer: " + blackTimer.GetMinutesString() + ":" + blackTimer.GetSecondsString(), 600, 520);
         for (int y = 0; y < 8; ++y)
         {
             for (int x = 0; x < 8; ++x)
@@ -398,6 +416,11 @@ public class ChessBoardScreen implements Screen
         {
             Gdx.app.log("Chessters", "Resetting!");
             Setup();
+        }
+
+        if (Button(mousePos, "Next turn", 75 * 8, 70, 200, 50))
+        {
+            Move("A1", "A2");
         }
 
         if (selectedTileX >= 0 && selectedTileY >= 0) {
