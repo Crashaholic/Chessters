@@ -16,6 +16,7 @@ public class ChessBoardScreen implements Screen
     public ChessPiece[/*column*/][/*row*/] board;
 
     private final Texture hlghtTile;
+    private final Texture hlghtTile2;
     private final Texture slectTile;
     private final Texture whiteTile;
     private final Texture blackTile;
@@ -36,6 +37,9 @@ public class ChessBoardScreen implements Screen
 
     private final Texture buttonTexture;
     private final Texture sideboardTexture;
+    private final Texture logoTexture;
+    private final Texture nextTurnIconTexture;
+    private final Texture resetIconTexture;
 
     private ChessPiece.Team currentTurn;
 
@@ -47,6 +51,8 @@ public class ChessBoardScreen implements Screen
     private final ChessTiming blackTimer;
 
     private boolean gameStarted;
+
+    private String[] gameMoveHistory;
 
     OrthographicCamera camera;
     FitViewport fitViewport;
@@ -64,11 +70,13 @@ public class ChessBoardScreen implements Screen
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         board = new ChessPiece[8][8];
+        gameMoveHistory = new String[10];
 
         hlghtTile = new Texture(Gdx.files.internal("htile.png"));
         slectTile = new Texture(Gdx.files.internal("stile.png"));
         whiteTile = new Texture(Gdx.files.internal("wtile.png"));
         blackTile = new Texture(Gdx.files.internal("btile.png"));
+        hlghtTile2= new Texture(Gdx.files.internal("htile2.png"));
 
         hlghtTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         slectTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -108,6 +116,14 @@ public class ChessBoardScreen implements Screen
 
         sideboardTexture = new Texture(Gdx.files.internal("sideboard.png"));
         sideboardTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
+        logoTexture = new Texture(Gdx.files.internal("logo.png"));
+
+        nextTurnIconTexture = new Texture(Gdx.files.internal("nextTurn.png"));
+        resetIconTexture = new Texture(Gdx.files.internal("reset.png"));
+
+        nextTurnIconTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        resetIconTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
     }
 
     public void DrawText(String text, float x, float y)
@@ -147,8 +163,18 @@ public class ChessBoardScreen implements Screen
         selectedTileX = selectedTileY = -1;
     }
 
+    public ChessPiece GetPieceAtTile(int x, int y)
+    {
+        /*ensure i dont check out of bounds*/
+        if (CheckBounds(x, y, 0, 8, 0, 8))
+            return board[x][y];
+        return null;
+    }
+
     public boolean ClickedHighlightedTile(Vector3 mousePos, int tileX, int tileY)
     {
+        if (!CheckBounds(tileX, tileY, 0, 8, 0, 8))
+            return false;
         HighlightTile(tileX, tileY);
         return ClickedTile(mousePos, tileX, tileY);
     }
@@ -162,15 +188,30 @@ public class ChessBoardScreen implements Screen
         xy[1] = yComponent;
     }
 
+    public void PushToHistory(String move)
+    {
+        for (int i = 9; i >= 1; --i)
+        {
+            gameMoveHistory[i] = gameMoveHistory[i - 1];
+        }
+        gameMoveHistory[0] = move;
+    }
 
-    /*TO WELLSON: USE THIS!!!*/
+    // to change from index to string, use to print
+    public String ConvertIndexToString(int x, int y)
+    {
+        char xComponent = 'A';
+        xComponent += (char)x;
+        y += 1;
+        String x1 = String.valueOf(xComponent);
+        String y1 = "" + y;
+        return x1 + y1;
+    }
+
     public void Move(int fromX, int fromY, int toX, int toY)
     {
-        //TODO: THIS THANG
-
         board[toX][toY] = board[fromX][fromY];
         board[fromX][fromY] = null;
-
         if (!ValidMove(fromX, fromY, toX, toY))
         {
             if (currentTurn == ChessPiece.Team.WHITE)
@@ -179,16 +220,17 @@ public class ChessBoardScreen implements Screen
                 {
                     gameStarted = true;
                 }
+                PushToHistory("White: " + ConvertIndexToString(fromX, fromY) + ConvertIndexToString(toX, toY));
                 currentTurn = ChessPiece.Team.BLACK;
             }
             else
             {
+                PushToHistory("Black: " + ConvertIndexToString(fromX, fromY) + ConvertIndexToString(toX, toY));
                 currentTurn = ChessPiece.Team.WHITE;
             }
         }
     }
 
-    /*TO WELLSON: USE THIS!!!*/
     public boolean ValidMove(int fromX, int fromY, int toX, int toY)
     {
         return false;
@@ -200,6 +242,11 @@ public class ChessBoardScreen implements Screen
         whiteTimer.Set(300.f);
         blackTimer.Set(300.f);
         gameStarted = false;
+
+        for (int i = 0; i < 10; i++)
+        {
+            gameMoveHistory[i] = "";
+        }
 
         currentTurn = ChessPiece.Team.WHITE;
         selectedTileX = selectedTileY = -1;
@@ -248,7 +295,10 @@ public class ChessBoardScreen implements Screen
 
     public void HighlightTile(int x, int y)
     {
-        game.batch.draw(hlghtTile, x * 75, y * 75, 75, 75);
+        if ((x + y) % 2 == 0)
+            game.batch.draw(hlghtTile, x * 75, y * 75, 75, 75);
+        else
+            game.batch.draw(hlghtTile2, x * 75, y * 75, 75, 75);
     }
 
     public void HighlightBySelectedTileOffset(int xOffset, int yOffset)
@@ -258,17 +308,6 @@ public class ChessBoardScreen implements Screen
         {
             HighlightTile(selectedTileX + xOffset, selectedTileY + yOffset);
         }
-    }
-
-    // to change from index to string, use to print
-    public String ConvertIndexToString(int x, int y)
-    {
-        char xComponent = 'A';
-        xComponent += (char)x;
-        y += 1;
-        String x1 = String.valueOf(xComponent);
-        String y1 = "" + y;
-        return x1 + y1;
     }
 
     @Override
@@ -284,7 +323,7 @@ public class ChessBoardScreen implements Screen
 
     public void DrawChessPieces()
     {
-        for (int x = 0; x < 8; ++x )
+        for (int x = 0; x < 8; ++x)
         {
             for (int y = 0; y < 8; ++y)
             {
@@ -352,45 +391,40 @@ public class ChessBoardScreen implements Screen
         if (gameStarted)
         {
             if (currentTurn == ChessPiece.Team.WHITE)
-            {
                 whiteTimer.Decrement(dt);
-            }
             else
-            {
                 blackTimer.Decrement(dt);
-            }
             globalTimer.Increment(dt);
         }
-
-        //if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-        //{
-            //bucket.x -= 200 * dt;
-        //}
-        //if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-        //{
-            //bucket.x += 200 * dt;
-        //}
-
 
         ScreenUtils.clear(1, 1, 1, 1);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
         game.batch.draw(sideboardTexture, 600, 0, 200, 600);
+        game.batch.draw(logoTexture, 600, 550, 200, 30);
         game.font.setColor(Color.BLACK);
         String str = "";
         if (selectedTileX >= 0 && selectedTileY >= 0)
+        {
             str = ConvertIndexToString(selectedTileX, selectedTileY);
-        DrawText("Current Selected: " + str, 630, 400);
-        DrawText("Game Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 630, 420);
-        DrawText("White Timer: " + whiteTimer.GetMinutesString() + ":" + whiteTimer.GetSecondsString(), 630, 320);
-        DrawText("Black Timer: " + blackTimer.GetMinutesString() + ":" + blackTimer.GetSecondsString(), 630, 520);
+            if (board[selectedTileX][selectedTileY] != null)
+            {
+                String team = board[selectedTileX][selectedTileY].team.toString();
+                String type = board[selectedTileX][selectedTileY].type.toString();
+                DrawText(team + " " + type, 620, 515);
+            }
+        }
+        DrawText("Current Selected: " + str, 620, 530);
+        DrawText("Game Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 630, 550);
+        DrawText("White Timer: " + whiteTimer.GetMinutesString() + ":" + whiteTimer.GetSecondsString(), 630, 225);
+        DrawText("Black Timer: " + blackTimer.GetMinutesString() + ":" + blackTimer.GetSecondsString(), 630, 405);
         if (currentTurn == ChessPiece.Team.WHITE)
         {
             Vector3 scale = new Vector3(game.font.getData().scaleX, game.font.getData().scaleY, 0);
             game.font.getData().setScale(scale.x + 1, scale.y + 1);
             game.font.setColor(Color.WHITE);
-            DrawText("White's Turn", 610, 250);
+            DrawText("White's Turn", 610, 205);
             game.font.getData().setScale(scale.x, scale.y);
         }
         else
@@ -398,10 +432,16 @@ public class ChessBoardScreen implements Screen
             Vector3 scale = new Vector3(game.font.getData().scaleX, game.font.getData().scaleY, 0);
             game.font.getData().setScale(scale.x + 1, scale.y + 1);
             game.font.setColor(Color.BLACK);
-            DrawText("Black's Turn", 610, 250);
+            DrawText("Black's Turn", 615, 435);
             game.font.getData().setScale(scale.x, scale.y);
         }
         game.font.setColor(Color.BLACK);
+
+        for (int i = 0; i < 10; i++)
+        {
+            if (gameMoveHistory[i] != null)
+                DrawText(gameMoveHistory[i], 630, 250 + i * 15);
+        }
 
         for (int y = 0; y < 8; ++y)
         {
@@ -418,10 +458,11 @@ public class ChessBoardScreen implements Screen
                     else
                         game.batch.draw(blackTile, x * 75, y * 75, 75, 75);
                 }
-                // if the click pos is within this tile's boundary
+                // if the click pos is within this tile's boundary.
                 // boundary is current tile's x to next tile's x
                 // and current tile's y to next tile's y
-                if (CheckBounds(mousePos.x, mousePos.y, x * 75, (x + 1) * 75, y * 75, (y + 1) * 75))
+                if (CheckBounds(mousePos.x, mousePos.y,
+                        x * 75, (x + 1) * 75, y * 75, (y + 1) * 75))
                 {
                     if (selectedTileX != x || selectedTileY != y)
                     {
@@ -449,93 +490,115 @@ public class ChessBoardScreen implements Screen
         game.batch.end();
         game.batch.begin();
 
-        if (Button(mousePos, "Reset Game", 75 * 8 + 10, 30, 180, 50))
+        if (Button(mousePos, "", 75 * 8 + 30, 30, 50, 50))
         {
             Gdx.app.log("Chessters", "Resetting!");
             Setup();
         }
 
-        if (Button(mousePos, "Next turn", 75 * 8 + 10, 80, 180, 50))
+        if (Button(mousePos, "", 75 * 8 + 110, 30, 50, 50))
         {
             Move(0, 0, 0, 0);
         }
+        game.batch.draw(resetIconTexture, 75 * 8 + 40, 40, 30, 30);
+        game.batch.draw(nextTurnIconTexture, 75 * 8 + 120, 40, 30, 30);
+        game.batch.end();
+        game.batch.begin();
 
         if (selectedTileX >= 0 && selectedTileY >= 0) {
             if (board[selectedTileX][selectedTileY] != null) {
                 if(currentTurn == ChessPiece.Team.WHITE) {
                     if (board[selectedTileX][selectedTileY].team == ChessPiece.Team.WHITE) {
+                        boolean hasMoved = false;
                         switch (board[selectedTileX][selectedTileY].type) {
                             case BISHOP:
-                                DrawText("W BISHOP", 600, 380);
                                 for (int i = 1; i < 8; i++ ) {
                                     HighlightBySelectedTileOffset(i, i);
                                     HighlightBySelectedTileOffset(-i, -i);
                                     HighlightBySelectedTileOffset(i, -i);
                                     HighlightBySelectedTileOffset(-i, i);
                                 }
-
                                 break;
                             case KNIGHT:
-                                DrawText("W KNIGHT", 600, 380);
-                                game.font.draw(game.batch, "W KNIGHT", 600, 380);
-                                if (CheckBounds(selectedTileX + 1, selectedTileY + 2,
-                                        0, 8, 0, 8)) {
-                                    if (board[selectedTileX + 1][selectedTileY + 2] == null)
-                                        HighlightBySelectedTileOffset(1, 2);
+                                if (GetPieceAtTile(selectedTileX + 1, selectedTileY + 2) == null)
+                                {
+                                    if (ClickedHighlightedTile(mousePos, selectedTileX + 1, selectedTileY + 2))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX + 1, selectedTileY + 2);
+                                        hasMoved = true;
+                                    }
                                 }
 
-                                if (CheckBounds(selectedTileX - 1, selectedTileY + 2,
-                                        0, 8, 0, 8)) {
-                                    if (board[selectedTileX - 1][selectedTileY + 2] == null)
-                                        HighlightBySelectedTileOffset(-1, 2);
+                                if (GetPieceAtTile(selectedTileX - 1, selectedTileY + 2) == null)
+                                {
+                                    if (ClickedHighlightedTile(mousePos, selectedTileX - 1, selectedTileY + 2))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX - 1, selectedTileY + 2);
+                                        hasMoved = true;
+                                    }
                                 }
 
-                                if (CheckBounds(selectedTileX + 1, selectedTileY - 2,
-                                        0, 8, 0, 8)) {
-                                    if (board[selectedTileX+1][selectedTileY-2] == null)
-                                        HighlightBySelectedTileOffset(1, -2);
+                                if (GetPieceAtTile(selectedTileX + 1, selectedTileY - 2) == null)
+                                {
+                                    if (ClickedHighlightedTile(mousePos, selectedTileX + 1, selectedTileY - 2))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX + 1, selectedTileY - 2);
+                                        hasMoved = true;
+                                    }
                                 }
 
-                                if (CheckBounds(selectedTileX - 1, selectedTileY - 2,
-                                        0, 8, 0, 8)) {
-                                    if (board[selectedTileX-1][selectedTileY-2] == null)
-                                        HighlightBySelectedTileOffset(-1, -2);
+                                if (GetPieceAtTile(selectedTileX - 1, selectedTileY - 2) == null)
+                                {
+                                    //HighlightBySelectedTileOffset(1, 2);
+                                    if (ClickedHighlightedTile(mousePos, selectedTileX - 1, selectedTileY - 2))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX - 1, selectedTileY - 2);
+                                        hasMoved = true;
+                                    }
                                 }
 
-                                if (CheckBounds(selectedTileX + 2, selectedTileY + 1,
-                                        0, 8, 0, 8)) {
-                                    if (board[selectedTileX+2][selectedTileY+1] == null)
-                                        HighlightBySelectedTileOffset(2, 1);
+                                if (GetPieceAtTile(selectedTileX + 2, selectedTileY + 1) == null)
+                                {
+                                    if (ClickedHighlightedTile(mousePos, selectedTileX + 2, selectedTileY + 1))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX + 2, selectedTileY + 1);
+                                        hasMoved = true;
+                                    }
                                 }
 
-                                if (CheckBounds(selectedTileX + 2, selectedTileY - 1,
-                                        0, 8, 0, 8)) {
-                                    if (board[selectedTileX+2][selectedTileY-1] == null)
-                                        HighlightBySelectedTileOffset(2, -1);
+                                if (GetPieceAtTile(selectedTileX + 2, selectedTileY - 1) == null)
+                                {
+                                    if (ClickedHighlightedTile(mousePos, selectedTileX + 2, selectedTileY - 1))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX + 2, selectedTileY - 1);
+                                        hasMoved = true;
+                                    }
                                 }
 
-                                if (CheckBounds(selectedTileX - 2, selectedTileY + 1,
-                                        0, 8, 0, 8)) {
-                                    if (board[selectedTileX-2][selectedTileY+1] == null)
-                                        HighlightBySelectedTileOffset(-2, 1);
+                                if (GetPieceAtTile(selectedTileX - 2, selectedTileY + 1) == null)
+                                {
+                                    if (ClickedHighlightedTile(mousePos, selectedTileX - 2, selectedTileY + 1))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX - 2, selectedTileY + 1);
+                                        hasMoved = true;
+                                    }
                                 }
 
-                                if (CheckBounds(selectedTileX - 2, selectedTileY - 1,
-                                        0, 8, 0, 8)) {
-                                    if (board[selectedTileX-2][selectedTileY-1] == null)
-                                        HighlightBySelectedTileOffset(-2, -1);
+                                if (GetPieceAtTile(selectedTileX - 2, selectedTileY - 1) == null)
+                                {
+                                    if (ClickedHighlightedTile(mousePos, selectedTileX - 2, selectedTileY - 1))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX - 2, selectedTileY - 1);
+                                        hasMoved = true;
+                                    }
                                 }
 
                                 break;
                             case KING:
-                                DrawText("W KING", 600, 380);
                                 break;
                             case QUEEN:
-                                DrawText("W QUEEN", 600, 380);
                                 break;
                             case ROOK:
-                                DrawText("W ROOK", 600, 380);
-                                boolean hasMoved = false;
                                 /*y side upwards check*/
                                 for (int i = selectedTileY; i < 8; i++)
                                 {
@@ -603,7 +666,6 @@ public class ChessBoardScreen implements Screen
                                 }
                                 break;
                             case PAWN:
-                                DrawText("W PAWN", 600, 380);
                                 if (selectedTileY == 1)
                                 {
                                     if (board[selectedTileX][selectedTileY + 1] == null)
@@ -611,92 +673,38 @@ public class ChessBoardScreen implements Screen
                                         if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY + 2))
                                         {
                                             Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 2);
-                                            ResetSelection();
+                                            hasMoved = true;
                                         }
                                     }
                                 }
                                 if (ClickedHighlightedTile(mousePos, selectedTileX, (selectedTileY + 1)))
                                 {
                                     Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 1);
-                                    ResetSelection();
+                                    hasMoved = true;
                                 }
                                 break;
                             default:
                                 break;
                         }
-
-                    }
-                    else if(board[selectedTileX][selectedTileY].team == ChessPiece.Team.BLACK) {
-                        switch (board[selectedTileX][selectedTileY].type) {
-                            case BISHOP:
-                                DrawText("B BISHOP", 600, 380);
-                                break;
-                            case KNIGHT:
-                                DrawText("B KNIGHT", 600, 380);
-                                break;
-                            case KING:
-                                DrawText("B KING", 600, 380);
-                                break;
-                            case QUEEN:
-                                DrawText("B QUEEN", 600, 380);
-                                break;
-                            case ROOK:
-                                DrawText("B ROOK", 600, 380);
-                                break;
-                            case PAWN:
-                                DrawText("B PAWN", 600, 380);
-                                break;
-                            default:
-                                break;
-                            }
+                        if (hasMoved)
+                            ResetSelection();
                     }
                 }
                 else {
-                    if (board[selectedTileX][selectedTileY].team == ChessPiece.Team.WHITE) {
+                    if(board[selectedTileX][selectedTileY].team == ChessPiece.Team.BLACK) {
                         switch (board[selectedTileX][selectedTileY].type) {
                             case BISHOP:
-                                DrawText("W BISHOP", 600, 380);
                                 break;
                             case KNIGHT:
-                                DrawText("W KNIGHT", 600, 380);
                                 break;
                             case KING:
-                                DrawText("W KING", 600, 380);
                                 break;
                             case QUEEN:
-                                DrawText("W QUEEN", 600, 380);
                                 break;
                             case ROOK:
-                                DrawText("W ROOK", 600, 380);
-                                break;
-                            case PAWN:
-                                DrawText("W PAWN", 600, 380);
-                                break;
-                            default:
-                                break;
-                        }
-
-                    }
-                    else if(board[selectedTileX][selectedTileY].team == ChessPiece.Team.BLACK) {
-                        switch (board[selectedTileX][selectedTileY].type) {
-                            case BISHOP:
-                                DrawText("B BISHOP", 600, 380);
-                                break;
-                            case KNIGHT:
-                                DrawText("B KNIGHT", 600, 380);
-                                break;
-                            case KING:
-                                DrawText("B KING", 600, 380);
-                                break;
-                            case QUEEN:
-                                DrawText("B QUEEN", 600, 380);
-                                break;
-                            case ROOK:
-                                DrawText("B ROOK", 600, 380);
                                 break;
                             case PAWN:
                                 HighlightBySelectedTileOffset(0, -1);
-                                DrawText("B PAWN", 600, 380);
                                 if (selectedTileY == 6) {
                                     HighlightBySelectedTileOffset(0, -2);
                                 }
@@ -752,6 +760,12 @@ public class ChessBoardScreen implements Screen
 
     @Override
     public void dispose() {
+        buttonTexture.dispose();
+        sideboardTexture.dispose();
+        nextTurnIconTexture.dispose();
+        resetIconTexture.dispose();
+        hlghtTile2.dispose();
+
         hlghtTile.dispose();
         slectTile.dispose();
         whiteTile.dispose();
