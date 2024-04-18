@@ -542,10 +542,52 @@ public class ChessBoardScreen implements Screen
                 switch (board[selectedTileX][selectedTileY].type) {
                     case BISHOP:
                         for (int i = 1; i < 8; i++ ) {
-                            HighlightBySelectedTileOffset(i, i);
-                            HighlightBySelectedTileOffset(-i, -i);
-                            HighlightBySelectedTileOffset(i, -i);
-                            HighlightBySelectedTileOffset(-i, i);
+                            //HighlightBySelectedTileOffset(i, i);
+                            //HighlightBySelectedTileOffset(-i, -i);
+                            //HighlightBySelectedTileOffset(i, -i);
+                            //HighlightBySelectedTileOffset(-i, i);
+
+                            TileStatus TR = GetTileStatus(selectedTileX + i, selectedTileY + i);
+                            TileStatus TL = GetTileStatus(selectedTileX - i, selectedTileY + i);
+                            TileStatus BR = GetTileStatus(selectedTileX + i, selectedTileY - i);
+                            TileStatus BL = GetTileStatus(selectedTileX - i, selectedTileY - i);
+
+                            if (TR != TileStatus.OUT_OF_BOUNDS && TR != TileStatus.HAS_ALLY)
+                            {
+                                if (ClickedHighlightedTile(mousePos, selectedTileX + i, selectedTileY + i))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX + i, selectedTileY + i);
+                                    hasMoved = true;
+                                }
+                            }
+
+                            if (TL != TileStatus.OUT_OF_BOUNDS && TL != TileStatus.HAS_ALLY)
+                            {
+                                if (ClickedHighlightedTile(mousePos, selectedTileX - i, selectedTileY + i))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX - i, selectedTileY + i);
+                                    hasMoved = true;
+                                }
+                            }
+
+                            if (BR != TileStatus.OUT_OF_BOUNDS && BR != TileStatus.HAS_ALLY)
+                            {
+                                if (ClickedHighlightedTile(mousePos, selectedTileX + i, selectedTileY - i))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX + i, selectedTileY - i);
+                                    hasMoved = true;
+                                }
+                            }
+
+                            if (BL != TileStatus.OUT_OF_BOUNDS && BL != TileStatus.HAS_ALLY)
+                            {
+                                if (ClickedHighlightedTile(mousePos, selectedTileX - i, selectedTileY - i))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX - i, selectedTileY - i);
+                                    hasMoved = true;
+                                }
+                            }
+
                         }
                         break;
                     case KNIGHT:
