@@ -655,14 +655,29 @@ public class ChessBoardScreen implements Screen
                             }
                         }
                         TileStatus ts = GetTileStatus(selectedTileX, selectedTileY - 1);
-                        if (ts == TileStatus.EMPTY || ts == TileStatus.HAS_ENEMY)
+                        TileStatus leftdiagts = GetTileStatus(selectedTileX-1, selectedTileY-1);
+                        TileStatus rightdiagts = GetTileStatus(selectedTileX+1, selectedTileY-1);
+                        if (ts == TileStatus.EMPTY)
                         {
-                            if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY - 1))
+                            if (ClickedHighlightedTile(mousePos, selectedTileX, (selectedTileY - 1)))
                             {
                                 Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY - 1);
                                 hasMoved = true;
                             }
                         }
+                        if (leftdiagts == TileStatus.HAS_ENEMY)
+                            if (ClickedHighlightedTile(mousePos, selectedTileX-1, (selectedTileY - 1)))
+                            {
+                                Move(selectedTileX, selectedTileY, selectedTileX-1, selectedTileY - 1);
+                                hasMoved = true;
+                            }
+
+                        if (rightdiagts == TileStatus.HAS_ENEMY)
+                            if (ClickedHighlightedTile(mousePos, selectedTileX+1, (selectedTileY - 1)))
+                            {
+                                Move(selectedTileX, selectedTileY, selectedTileX+1, selectedTileY - 1);
+                                hasMoved = true;
+                            }
                     }
                     break;
                 default:
