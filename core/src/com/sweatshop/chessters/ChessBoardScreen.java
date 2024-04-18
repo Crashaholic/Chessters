@@ -163,12 +163,34 @@ public class ChessBoardScreen implements Screen
         selectedTileX = selectedTileY = -1;
     }
 
+    public enum TileStatus
+    {
+        OUTOFBOUNDS,
+        EMPTY,
+        HASALLY,
+        HASENEMY
+    }
+
     public ChessPiece GetPieceAtTile(int x, int y)
     {
         /*ensure i dont check out of bounds*/
         if (CheckBounds(x, y, 0, 8, 0, 8))
             return board[x][y];
         return null;
+    }
+
+    public TileStatus GetTileStatus(int x, int y)
+    {
+        ChessPiece pieceAtTile = GetPieceAtTile(x, y);
+        if (CheckBounds(x, y,0, 8, 0, 8))
+        {
+            if (pieceAtTile == null)
+                return TileStatus.EMPTY;
+            else if (pieceAtTile.team == currentTurn)
+                return TileStatus.HASALLY;
+            else return TileStatus.HASENEMY;
+        }
+        return TileStatus.OUTOFBOUNDS;
     }
 
     public boolean ClickedHighlightedTile(Vector3 mousePos, int tileX, int tileY)
@@ -323,6 +345,7 @@ public class ChessBoardScreen implements Screen
 
     public void DrawChessPieces()
     {
+        game.pieceBatch.begin();
         for (int x = 0; x < 8; ++x)
         {
             for (int y = 0; y < 8; ++y)
@@ -379,6 +402,7 @@ public class ChessBoardScreen implements Screen
                 }
             }
         }
+        game.pieceBatch.end();
     }
 
     @Override
@@ -520,7 +544,8 @@ public class ChessBoardScreen implements Screen
                                 }
                                 break;
                             case KNIGHT:
-                                if (GetPieceAtTile(selectedTileX + 1, selectedTileY + 2) == null)
+                                if (GetTileStatus(selectedTileX + 1, selectedTileY + 2) != TileStatus.OUTOFBOUNDS &&
+                                        GetTileStatus(selectedTileX + 1, selectedTileY + 2) != TileStatus.HASALLY )
                                 {
                                     if (ClickedHighlightedTile(mousePos, selectedTileX + 1, selectedTileY + 2))
                                     {
@@ -529,7 +554,8 @@ public class ChessBoardScreen implements Screen
                                     }
                                 }
 
-                                if (GetPieceAtTile(selectedTileX - 1, selectedTileY + 2) == null)
+                                if (GetTileStatus(selectedTileX - 1, selectedTileY + 2) != TileStatus.OUTOFBOUNDS &&
+                                        GetTileStatus(selectedTileX - 1, selectedTileY + 2) != TileStatus.HASALLY )
                                 {
                                     if (ClickedHighlightedTile(mousePos, selectedTileX - 1, selectedTileY + 2))
                                     {
@@ -538,7 +564,8 @@ public class ChessBoardScreen implements Screen
                                     }
                                 }
 
-                                if (GetPieceAtTile(selectedTileX + 1, selectedTileY - 2) == null)
+                                if (GetTileStatus(selectedTileX + 1, selectedTileY - 2) != TileStatus.OUTOFBOUNDS &&
+                                        GetTileStatus(selectedTileX + 1, selectedTileY - 2) != TileStatus.HASALLY )
                                 {
                                     if (ClickedHighlightedTile(mousePos, selectedTileX + 1, selectedTileY - 2))
                                     {
@@ -547,7 +574,8 @@ public class ChessBoardScreen implements Screen
                                     }
                                 }
 
-                                if (GetPieceAtTile(selectedTileX - 1, selectedTileY - 2) == null)
+                                if (GetTileStatus(selectedTileX - 1, selectedTileY - 2) != TileStatus.OUTOFBOUNDS &&
+                                        GetTileStatus(selectedTileX - 1, selectedTileY - 2) != TileStatus.HASALLY )
                                 {
                                     //HighlightBySelectedTileOffset(1, 2);
                                     if (ClickedHighlightedTile(mousePos, selectedTileX - 1, selectedTileY - 2))
@@ -557,7 +585,8 @@ public class ChessBoardScreen implements Screen
                                     }
                                 }
 
-                                if (GetPieceAtTile(selectedTileX + 2, selectedTileY + 1) == null)
+                                if (GetTileStatus(selectedTileX + 2, selectedTileY + 1) != TileStatus.OUTOFBOUNDS &&
+                                        GetTileStatus(selectedTileX + 2, selectedTileY + 1) != TileStatus.HASALLY )
                                 {
                                     if (ClickedHighlightedTile(mousePos, selectedTileX + 2, selectedTileY + 1))
                                     {
@@ -566,7 +595,8 @@ public class ChessBoardScreen implements Screen
                                     }
                                 }
 
-                                if (GetPieceAtTile(selectedTileX + 2, selectedTileY - 1) == null)
+                                if (GetTileStatus(selectedTileX + 2, selectedTileY - 1) != TileStatus.OUTOFBOUNDS &&
+                                        GetTileStatus(selectedTileX + 2, selectedTileY - 1) != TileStatus.HASALLY )
                                 {
                                     if (ClickedHighlightedTile(mousePos, selectedTileX + 2, selectedTileY - 1))
                                     {
@@ -575,7 +605,8 @@ public class ChessBoardScreen implements Screen
                                     }
                                 }
 
-                                if (GetPieceAtTile(selectedTileX - 2, selectedTileY + 1) == null)
+                                if (GetTileStatus(selectedTileX - 2, selectedTileY + 1) != TileStatus.OUTOFBOUNDS &&
+                                        GetTileStatus(selectedTileX - 2, selectedTileY + 1) != TileStatus.HASALLY )
                                 {
                                     if (ClickedHighlightedTile(mousePos, selectedTileX - 2, selectedTileY + 1))
                                     {
@@ -584,7 +615,8 @@ public class ChessBoardScreen implements Screen
                                     }
                                 }
 
-                                if (GetPieceAtTile(selectedTileX - 2, selectedTileY - 1) == null)
+                                if (GetTileStatus(selectedTileX - 2, selectedTileY - 1) != TileStatus.OUTOFBOUNDS &&
+                                        GetTileStatus(selectedTileX - 2, selectedTileY - 1) != TileStatus.HASALLY )
                                 {
                                     if (ClickedHighlightedTile(mousePos, selectedTileX - 2, selectedTileY - 1))
                                     {
@@ -600,11 +632,15 @@ public class ChessBoardScreen implements Screen
                                 break;
                             case ROOK:
                                 /*y side upwards check*/
+                                boolean enemyTile = false;
                                 for (int i = selectedTileY; i < 8; i++)
                                 {
                                     if (i == selectedTileY)
                                         continue;
-                                    if (board[selectedTileX][i] == null)
+                                    TileStatus ts = GetTileStatus(selectedTileX, i);
+                                    if (ts == TileStatus.HASALLY || enemyTile)
+                                        break;
+                                    if (ts == TileStatus.EMPTY)
                                     {
                                         if (ClickedHighlightedTile(mousePos, selectedTileX, i))
                                         {
@@ -612,14 +648,26 @@ public class ChessBoardScreen implements Screen
                                             hasMoved = true;
                                         }
                                     }
-                                    else break;
+                                    else if (ts == TileStatus.HASENEMY)
+                                    {
+                                        enemyTile = true;
+                                        if (ClickedHighlightedTile(mousePos, selectedTileX, i))
+                                        {
+                                            Move(selectedTileX, selectedTileY, selectedTileX, i);
+                                            hasMoved = true;
+                                        }
+                                    }
                                 }
+                                enemyTile = false;
                                 /*y side downwards check*/
                                 for (int i = selectedTileY; i >= 0; i--)
                                 {
                                     if (i == selectedTileY)
                                         continue;
-                                    if (board[selectedTileX][i] == null)
+                                    TileStatus ts = GetTileStatus(selectedTileX, i);
+                                    if (ts == TileStatus.HASALLY || enemyTile)
+                                        break;
+                                    if (ts == TileStatus.EMPTY)
                                     {
                                         if (ClickedHighlightedTile(mousePos, selectedTileX, i))
                                         {
@@ -627,15 +675,26 @@ public class ChessBoardScreen implements Screen
                                             hasMoved = true;
                                         }
                                     }
-                                    else break;
+                                    else if (ts == TileStatus.HASENEMY)
+                                    {
+                                        enemyTile = true;
+                                        if (ClickedHighlightedTile(mousePos, selectedTileX, i))
+                                        {
+                                            Move(selectedTileX, selectedTileY, selectedTileX, i);
+                                            hasMoved = true;
+                                        }
+                                    }
                                 }
-
+                                enemyTile = false;
                                 /*x side rightwards check*/
                                 for (int i = selectedTileX; i < 8; i++)
                                 {
                                     if (i == selectedTileX)
                                         continue;
-                                    if (board[i][selectedTileY] == null)
+                                    TileStatus ts = GetTileStatus(i, selectedTileY);
+                                    if (ts == TileStatus.HASALLY || enemyTile)
+                                        break;
+                                    if (ts == TileStatus.EMPTY)
                                     {
                                         if (ClickedHighlightedTile(mousePos, i, selectedTileY))
                                         {
@@ -643,14 +702,26 @@ public class ChessBoardScreen implements Screen
                                             hasMoved = true;
                                         }
                                     }
-                                    else break;
+                                    else if (ts == TileStatus.HASENEMY)
+                                    {
+                                        enemyTile = true;
+                                        if (ClickedHighlightedTile(mousePos, i, selectedTileY))
+                                        {
+                                            Move(selectedTileX, selectedTileY, i, selectedTileY);
+                                            hasMoved = true;
+                                        }
+                                    }
                                 }
+                                enemyTile = false;
                                 /*x side leftwards check*/
                                 for (int i = selectedTileX; i >= 0; i--)
                                 {
                                     if (i == selectedTileX)
                                         continue;
-                                    if (board[i][selectedTileY] == null)
+                                    TileStatus ts = GetTileStatus(i, selectedTileY);
+                                    if (ts == TileStatus.HASALLY || enemyTile)
+                                        break;
+                                    if (ts == TileStatus.EMPTY)
                                     {
                                         if (ClickedHighlightedTile(mousePos, i, selectedTileY))
                                         {
@@ -658,7 +729,15 @@ public class ChessBoardScreen implements Screen
                                             hasMoved = true;
                                         }
                                     }
-                                    else break;
+                                    else if (ts == TileStatus.HASENEMY)
+                                    {
+                                        enemyTile = true;
+                                        if (ClickedHighlightedTile(mousePos, i, selectedTileY))
+                                        {
+                                            Move(selectedTileX, selectedTileY, i, selectedTileY);
+                                            hasMoved = true;
+                                        }
+                                    }
                                 }
                                 if (hasMoved)
                                 {
@@ -692,6 +771,7 @@ public class ChessBoardScreen implements Screen
                 }
                 else {
                     if(board[selectedTileX][selectedTileY].team == ChessPiece.Team.BLACK) {
+                        boolean hasMoved = false;
                         switch (board[selectedTileX][selectedTileY].type) {
                             case BISHOP:
                                 break;
@@ -704,14 +784,33 @@ public class ChessBoardScreen implements Screen
                             case ROOK:
                                 break;
                             case PAWN:
-                                HighlightBySelectedTileOffset(0, -1);
-                                if (selectedTileY == 6) {
-                                    HighlightBySelectedTileOffset(0, -2);
+                                if (selectedTileY == 6)
+                                {
+                                    TileStatus ts = GetTileStatus(selectedTileX, selectedTileY - 1);
+                                    if (ts == TileStatus.EMPTY || ts == TileStatus.HASENEMY)
+                                    {
+                                        if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY - 2))
+                                        {
+                                            Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY - 2);
+                                            hasMoved = true;
+                                        }
+                                    }
+                                }
+                                TileStatus ts = GetTileStatus(selectedTileX, selectedTileY - 1);
+                                if (ts == TileStatus.EMPTY || ts == TileStatus.HASENEMY)
+                                {
+                                    if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY - 1))
+                                    {
+                                        Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY - 1);
+                                        hasMoved = true;
+                                    }
                                 }
                                 break;
                             default:
                                 break;
                         }
+                        if (hasMoved)
+                            ResetSelection();
                     }
                 }
 
@@ -720,9 +819,7 @@ public class ChessBoardScreen implements Screen
         }
         game.batch.end();
 
-        game.pieceBatch.begin();
         DrawChessPieces();
-        game.pieceBatch.end();
 
         game.batch.begin();
         game.font.setColor(Color.WHITE);
