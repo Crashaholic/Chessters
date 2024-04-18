@@ -541,54 +541,91 @@ public class ChessBoardScreen implements Screen
                 boolean hasMoved = false;
                 switch (board[selectedTileX][selectedTileY].type) {
                     case BISHOP:
-                        for (int i = 1; i < 8; i++ ) {
-                            //HighlightBySelectedTileOffset(i, i);
-                            //HighlightBySelectedTileOffset(-i, -i);
-                            //HighlightBySelectedTileOffset(i, -i);
-                            //HighlightBySelectedTileOffset(-i, i);
-
-                            TileStatus TR = GetTileStatus(selectedTileX + i, selectedTileY + i);
-                            TileStatus TL = GetTileStatus(selectedTileX - i, selectedTileY + i);
-                            TileStatus BR = GetTileStatus(selectedTileX + i, selectedTileY - i);
-                            TileStatus BL = GetTileStatus(selectedTileX - i, selectedTileY - i);
-
-                            if (TR != TileStatus.OUT_OF_BOUNDS && TR != TileStatus.HAS_ALLY)
+                        boolean bishop_hasEnemy = false;
+                        for (int upperRight = 1; upperRight < 8; upperRight++)
+                        {
+                            if (bishop_hasEnemy)
+                                break;
+                            TileStatus ts = GetTileStatus(selectedTileX + upperRight, selectedTileY + upperRight);
+                            if (ts == TileStatus.OUT_OF_BOUNDS || ts == TileStatus.HAS_ALLY)
                             {
-                                if (ClickedHighlightedTile(mousePos, selectedTileX + i, selectedTileY + i))
+                                break;
+                            }
+                            else
+                            {
+                                if (ts == TileStatus.HAS_ENEMY)
+                                    bishop_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX + upperRight, selectedTileY + upperRight))
                                 {
-                                    Move(selectedTileX, selectedTileY, selectedTileX + i, selectedTileY + i);
+                                    Move(selectedTileX, selectedTileY, selectedTileX + upperRight, selectedTileY + upperRight);
                                     hasMoved = true;
                                 }
                             }
-
-                            if (TL != TileStatus.OUT_OF_BOUNDS && TL != TileStatus.HAS_ALLY)
-                            {
-                                if (ClickedHighlightedTile(mousePos, selectedTileX - i, selectedTileY + i))
-                                {
-                                    Move(selectedTileX, selectedTileY, selectedTileX - i, selectedTileY + i);
-                                    hasMoved = true;
-                                }
-                            }
-
-                            if (BR != TileStatus.OUT_OF_BOUNDS && BR != TileStatus.HAS_ALLY)
-                            {
-                                if (ClickedHighlightedTile(mousePos, selectedTileX + i, selectedTileY - i))
-                                {
-                                    Move(selectedTileX, selectedTileY, selectedTileX + i, selectedTileY - i);
-                                    hasMoved = true;
-                                }
-                            }
-
-                            if (BL != TileStatus.OUT_OF_BOUNDS && BL != TileStatus.HAS_ALLY)
-                            {
-                                if (ClickedHighlightedTile(mousePos, selectedTileX - i, selectedTileY - i))
-                                {
-                                    Move(selectedTileX, selectedTileY, selectedTileX - i, selectedTileY - i);
-                                    hasMoved = true;
-                                }
-                            }
-
                         }
+                        bishop_hasEnemy = false;
+                        for (int upperLeft = 1; upperLeft < 8; upperLeft++)
+                        {
+                            if (bishop_hasEnemy)
+                                break;
+                            TileStatus ts = GetTileStatus(selectedTileX - upperLeft, selectedTileY + upperLeft);
+                            if (ts == TileStatus.OUT_OF_BOUNDS || ts == TileStatus.HAS_ALLY)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                if (ts == TileStatus.HAS_ENEMY)
+                                    bishop_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX - upperLeft, selectedTileY + upperLeft))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX - upperLeft, selectedTileY + upperLeft);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                        bishop_hasEnemy = false;
+                        for (int lowerRight = 1; lowerRight < 8; lowerRight++)
+                        {
+                            if (bishop_hasEnemy)
+                                break;
+                            TileStatus ts = GetTileStatus(selectedTileX + lowerRight, selectedTileY - lowerRight);
+                            if (ts == TileStatus.OUT_OF_BOUNDS || ts == TileStatus.HAS_ALLY)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                if (ts == TileStatus.HAS_ENEMY)
+                                    bishop_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX + lowerRight, selectedTileY - lowerRight))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX + lowerRight, selectedTileY - lowerRight);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                        bishop_hasEnemy = false;
+                        for (int lowerLeft = 1; lowerLeft < 8; lowerLeft++)
+                        {
+                            if (bishop_hasEnemy)
+                                break;
+                            TileStatus ts = GetTileStatus(selectedTileX - lowerLeft, selectedTileY - lowerLeft);
+                            if (ts == TileStatus.OUT_OF_BOUNDS || ts == TileStatus.HAS_ALLY)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                if (ts == TileStatus.HAS_ENEMY)
+                                    bishop_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX - lowerLeft, selectedTileY - lowerLeft))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX - lowerLeft, selectedTileY - lowerLeft);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+
                         break;
                     case KNIGHT:
                         if (GetTileStatus(selectedTileX + 1, selectedTileY + 2) != TileStatus.OUT_OF_BOUNDS &&
@@ -676,16 +713,98 @@ public class ChessBoardScreen implements Screen
                     case KING:
                         break;
                     case QUEEN:
-                        break;
-                    case ROOK:
+                        boolean queen_hasEnemy = false;
+                        for (int upperRight = 1; upperRight < 8; upperRight++)
+                        {
+                            if (queen_hasEnemy)
+                                break;
+                            TileStatus ts = GetTileStatus(selectedTileX + upperRight, selectedTileY + upperRight);
+                            if (ts == TileStatus.OUT_OF_BOUNDS || ts == TileStatus.HAS_ALLY)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                if (ts == TileStatus.HAS_ENEMY)
+                                    queen_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX + upperRight, selectedTileY + upperRight))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX + upperRight, selectedTileY + upperRight);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                        queen_hasEnemy = false;
+                        for (int upperLeft = 1; upperLeft < 8; upperLeft++)
+                        {
+                            if (queen_hasEnemy)
+                                break;
+                            TileStatus ts = GetTileStatus(selectedTileX - upperLeft, selectedTileY + upperLeft);
+                            if (ts == TileStatus.OUT_OF_BOUNDS || ts == TileStatus.HAS_ALLY)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                if (ts == TileStatus.HAS_ENEMY)
+                                    queen_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX - upperLeft, selectedTileY + upperLeft))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX - upperLeft, selectedTileY + upperLeft);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                        queen_hasEnemy = false;
+                        for (int lowerRight = 1; lowerRight < 8; lowerRight++)
+                        {
+                            if (queen_hasEnemy)
+                                break;
+                            TileStatus ts = GetTileStatus(selectedTileX + lowerRight, selectedTileY - lowerRight);
+                            if (ts == TileStatus.OUT_OF_BOUNDS || ts == TileStatus.HAS_ALLY)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                if (ts == TileStatus.HAS_ENEMY)
+                                    queen_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX + lowerRight, selectedTileY - lowerRight))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX + lowerRight, selectedTileY - lowerRight);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                        queen_hasEnemy = false;
+                        for (int lowerLeft = 1; lowerLeft < 8; lowerLeft++)
+                        {
+                            if (queen_hasEnemy)
+                                break;
+                            TileStatus ts = GetTileStatus(selectedTileX - lowerLeft, selectedTileY - lowerLeft);
+                            if (ts == TileStatus.OUT_OF_BOUNDS || ts == TileStatus.HAS_ALLY)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                if (ts == TileStatus.HAS_ENEMY)
+                                    queen_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX - lowerLeft, selectedTileY - lowerLeft))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX - lowerLeft, selectedTileY - lowerLeft);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
                         /*y side upwards check*/
-                        boolean enemyTile = false;
+                        queen_hasEnemy = false;
                         for (int i = selectedTileY; i < 8; i++)
                         {
                             if (i == selectedTileY)
                                 continue;
                             TileStatus ts = GetTileStatus(selectedTileX, i);
-                            if (ts == TileStatus.HAS_ALLY || enemyTile)
+                            if (ts == TileStatus.HAS_ALLY || queen_hasEnemy)
                                 break;
                             if (ts == TileStatus.EMPTY)
                             {
@@ -697,7 +816,7 @@ public class ChessBoardScreen implements Screen
                             }
                             else if (ts == TileStatus.HAS_ENEMY)
                             {
-                                enemyTile = true;
+                                queen_hasEnemy = true;
                                 if (ClickedHighlightedTile(mousePos, selectedTileX, i))
                                 {
                                     Move(selectedTileX, selectedTileY, selectedTileX, i);
@@ -705,14 +824,14 @@ public class ChessBoardScreen implements Screen
                                 }
                             }
                         }
-                        enemyTile = false;
+                        queen_hasEnemy = false;
                         /*y side downwards check*/
                         for (int i = selectedTileY; i >= 0; i--)
                         {
                             if (i == selectedTileY)
                                 continue;
                             TileStatus ts = GetTileStatus(selectedTileX, i);
-                            if (ts == TileStatus.HAS_ALLY || enemyTile)
+                            if (ts == TileStatus.HAS_ALLY || queen_hasEnemy)
                                 break;
                             if (ts == TileStatus.EMPTY)
                             {
@@ -724,7 +843,7 @@ public class ChessBoardScreen implements Screen
                             }
                             else if (ts == TileStatus.HAS_ENEMY)
                             {
-                                enemyTile = true;
+                                queen_hasEnemy = true;
                                 if (ClickedHighlightedTile(mousePos, selectedTileX, i))
                                 {
                                     Move(selectedTileX, selectedTileY, selectedTileX, i);
@@ -732,14 +851,14 @@ public class ChessBoardScreen implements Screen
                                 }
                             }
                         }
-                        enemyTile = false;
+                        queen_hasEnemy = false;
                         /*x side rightwards check*/
                         for (int i = selectedTileX; i < 8; i++)
                         {
                             if (i == selectedTileX)
                                 continue;
                             TileStatus ts = GetTileStatus(i, selectedTileY);
-                            if (ts == TileStatus.HAS_ALLY || enemyTile)
+                            if (ts == TileStatus.HAS_ALLY || queen_hasEnemy)
                                 break;
                             if (ts == TileStatus.EMPTY)
                             {
@@ -751,7 +870,7 @@ public class ChessBoardScreen implements Screen
                             }
                             else if (ts == TileStatus.HAS_ENEMY)
                             {
-                                enemyTile = true;
+                                queen_hasEnemy = true;
                                 if (ClickedHighlightedTile(mousePos, i, selectedTileY))
                                 {
                                     Move(selectedTileX, selectedTileY, i, selectedTileY);
@@ -759,14 +878,14 @@ public class ChessBoardScreen implements Screen
                                 }
                             }
                         }
-                        enemyTile = false;
+                        queen_hasEnemy = false;
                         /*x side leftwards check*/
                         for (int i = selectedTileX; i >= 0; i--)
                         {
                             if (i == selectedTileX)
                                 continue;
                             TileStatus ts = GetTileStatus(i, selectedTileY);
-                            if (ts == TileStatus.HAS_ALLY || enemyTile)
+                            if (ts == TileStatus.HAS_ALLY || queen_hasEnemy)
                                 break;
                             if (ts == TileStatus.EMPTY)
                             {
@@ -778,7 +897,7 @@ public class ChessBoardScreen implements Screen
                             }
                             else if (ts == TileStatus.HAS_ENEMY)
                             {
-                                enemyTile = true;
+                                queen_hasEnemy = true;
                                 if (ClickedHighlightedTile(mousePos, i, selectedTileY))
                                 {
                                     Move(selectedTileX, selectedTileY, i, selectedTileY);
@@ -786,9 +905,115 @@ public class ChessBoardScreen implements Screen
                                 }
                             }
                         }
-                        if (hasMoved)
+                        break;
+                    case ROOK:
+                        /*y side upwards check*/
+                        boolean rook_hasEnemy = false;
+                        for (int i = selectedTileY; i < 8; i++)
                         {
-                            ResetSelection();
+                            if (i == selectedTileY)
+                                continue;
+                            TileStatus ts = GetTileStatus(selectedTileX, i);
+                            if (ts == TileStatus.HAS_ALLY || rook_hasEnemy)
+                                break;
+                            if (ts == TileStatus.EMPTY)
+                            {
+                                if (ClickedHighlightedTile(mousePos, selectedTileX, i))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX, i);
+                                    hasMoved = true;
+                                }
+                            }
+                            else if (ts == TileStatus.HAS_ENEMY)
+                            {
+                                rook_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX, i))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX, i);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                        rook_hasEnemy = false;
+                        /*y side downwards check*/
+                        for (int i = selectedTileY; i >= 0; i--)
+                        {
+                            if (i == selectedTileY)
+                                continue;
+                            TileStatus ts = GetTileStatus(selectedTileX, i);
+                            if (ts == TileStatus.HAS_ALLY || rook_hasEnemy)
+                                break;
+                            if (ts == TileStatus.EMPTY)
+                            {
+                                if (ClickedHighlightedTile(mousePos, selectedTileX, i))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX, i);
+                                    hasMoved = true;
+                                }
+                            }
+                            else if (ts == TileStatus.HAS_ENEMY)
+                            {
+                                rook_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, selectedTileX, i))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX, i);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                        rook_hasEnemy = false;
+                        /*x side rightwards check*/
+                        for (int i = selectedTileX; i < 8; i++)
+                        {
+                            if (i == selectedTileX)
+                                continue;
+                            TileStatus ts = GetTileStatus(i, selectedTileY);
+                            if (ts == TileStatus.HAS_ALLY || rook_hasEnemy)
+                                break;
+                            if (ts == TileStatus.EMPTY)
+                            {
+                                if (ClickedHighlightedTile(mousePos, i, selectedTileY))
+                                {
+                                    Move(selectedTileX, selectedTileY, i, selectedTileY);
+                                    hasMoved = true;
+                                }
+                            }
+                            else if (ts == TileStatus.HAS_ENEMY)
+                            {
+                                rook_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, i, selectedTileY))
+                                {
+                                    Move(selectedTileX, selectedTileY, i, selectedTileY);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                        rook_hasEnemy = false;
+                        /*x side leftwards check*/
+                        for (int i = selectedTileX; i >= 0; i--)
+                        {
+                            if (i == selectedTileX)
+                                continue;
+                            TileStatus ts = GetTileStatus(i, selectedTileY);
+                            if (ts == TileStatus.HAS_ALLY || rook_hasEnemy)
+                                break;
+                            if (ts == TileStatus.EMPTY)
+                            {
+                                if (ClickedHighlightedTile(mousePos, i, selectedTileY))
+                                {
+                                    Move(selectedTileX, selectedTileY, i, selectedTileY);
+                                    hasMoved = true;
+                                }
+                            }
+                            else if (ts == TileStatus.HAS_ENEMY)
+                            {
+                                rook_hasEnemy = true;
+                                if (ClickedHighlightedTile(mousePos, i, selectedTileY))
+                                {
+                                    Move(selectedTileX, selectedTileY, i, selectedTileY);
+                                    hasMoved = true;
+                                }
+                            }
                         }
                         break;
                     case PAWN:
