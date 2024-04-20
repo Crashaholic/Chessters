@@ -52,10 +52,19 @@ public class ChessBoardScreen implements Screen
 
     private boolean gameStarted;
 
-    private String[] gameMoveHistory;
+    private final String[] gameMoveHistory;
+    private int gameMovesTurnCount;
 
     OrthographicCamera camera;
     FitViewport fitViewport;
+
+    public enum TileStatus
+    {
+        OUT_OF_BOUNDS,
+        EMPTY,
+        HAS_ALLY,
+        HAS_ENEMY
+    }
 
     public ChessBoardScreen(final ChesstersGame game)
     {
@@ -163,14 +172,6 @@ public class ChessBoardScreen implements Screen
         selectedTileX = selectedTileY = -1;
     }
 
-    public enum TileStatus
-    {
-        OUT_OF_BOUNDS,
-        EMPTY,
-        HAS_ALLY,
-        HAS_ENEMY
-    }
-
     public ChessPiece GetPieceAtTile(int x, int y)
     {
         /*ensure i dont check out of bounds*/
@@ -201,15 +202,6 @@ public class ChessBoardScreen implements Screen
         return ClickedTile(mousePos, tileX, tileY);
     }
 
-    /*turn A1 -> 0*/
-    public void GetIndex(String gridCode, int[] xy)
-    {
-        int xComponent = gridCode.charAt(0) - 'A';
-        int yComponent = gridCode.charAt(1) - 1;
-        xy[0] = xComponent;
-        xy[1] = yComponent;
-    }
-
     public void PushToHistory(String move)
     {
         for (int i = 9; i >= 1; --i)
@@ -222,40 +214,66 @@ public class ChessBoardScreen implements Screen
     // to change from index to string, use to print
     public String ConvertIndexToString(int x, int y)
     {
-        char xComponent = 'A';
-        xComponent += (char)x;
+        char xComponent = (char)('a' + x);
         y += 1;
-        String x1 = String.valueOf(xComponent);
-        String y1 = "" + y;
-        return x1 + y1;
+        return xComponent + String.valueOf(y);
     }
 
     public void Move(int fromX, int fromY, int toX, int toY)
     {
+        String move = "";
+        ChessPiece.Piece_Type t = board[fromX][fromY].type;
+        switch(t)
+        {
+            case PAWN:
+                move += "";
+                break;
+            case ROOK:
+                move += "R";
+                break;
+            case QUEEN:
+                move += "Q";
+                break;
+            case KING:
+                move += "K";
+                break;
+            case KNIGHT:
+                move += "N";
+                break;
+            case BISHOP:
+                move += "B";
+                break;
+            default:
+                // should never land here EVER, but handled just in case
+                break;
+        }
+        boolean isCapture = GetTileStatus(toX, toY) == TileStatus.HAS_ENEMY;
         board[toX][toY] = board[fromX][fromY];
         board[fromX][fromY] = null;
-        if (!ValidMove(fromX, fromY, toX, toY))
+        if (isCapture)
         {
-            if (currentTurn == ChessPiece.Team.WHITE)
+            if (t == ChessPiece.Piece_Type.PAWN)
             {
-                if (!gameStarted)
-                {
-                    gameStarted = true;
-                }
-                PushToHistory("White: " + ConvertIndexToString(fromX, fromY) + ConvertIndexToString(toX, toY));
-                currentTurn = ChessPiece.Team.BLACK;
+                move += ConvertIndexToString(fromX, fromY).charAt(0);
             }
-            else
-            {
-                PushToHistory("Black: " + ConvertIndexToString(fromX, fromY) + ConvertIndexToString(toX, toY));
-                currentTurn = ChessPiece.Team.WHITE;
-            }
+            move += "x";
         }
-    }
-
-    public boolean ValidMove(int fromX, int fromY, int toX, int toY)
-    {
-        return false;
+        move += ConvertIndexToString(toX, toY);
+        if (currentTurn == ChessPiece.Team.WHITE)
+        {
+            if (!gameStarted)
+            {
+                gameStarted = true;
+            }
+            PushToHistory(gameMovesTurnCount + ": " + move);
+            currentTurn = ChessPiece.Team.BLACK;
+        }
+        else
+        {
+            gameMoveHistory[0] += " " + move;
+            gameMovesTurnCount++;
+            currentTurn = ChessPiece.Team.WHITE;
+        }
     }
     
     public void Setup()
@@ -269,6 +287,8 @@ public class ChessBoardScreen implements Screen
         {
             gameMoveHistory[i] = "";
         }
+
+        gameMovesTurnCount = 1;
 
         currentTurn = ChessPiece.Team.WHITE;
         selectedTileX = selectedTileY = -1;
@@ -368,27 +388,28 @@ public class ChessBoardScreen implements Screen
             {
                 if (board[x][y] != null)
                 {
+                    Texture pieceToDraw = null;
                     if (board[x][y].team == ChessPiece.Team.WHITE)
                     {
                         switch (board[x][y].type)
                         {
                             case BISHOP:
-                                DrawPiece(whiteBish, x * 75, y * 75);
+                                pieceToDraw = whiteBish;
                                 break;
                             case KNIGHT:
-                                DrawPiece(whiteKngt, x * 75, y * 75);
+                                pieceToDraw = whiteKngt;
                                 break;
                             case KING:
-                                DrawPiece(whiteKing, x * 75, y * 75);
+                                pieceToDraw = whiteKing;
                                 break;
                             case QUEEN:
-                                DrawPiece(whiteQuen, x * 75, y * 75);
+                                pieceToDraw = whiteQuen;
                                 break;
                             case ROOK:
-                                DrawPiece(whiteRook, x * 75, y * 75);
+                                pieceToDraw = whiteRook;
                                 break;
                             case PAWN:
-                                DrawPiece(whitePawn, x * 75, y * 75);
+                                pieceToDraw = whitePawn;
                                 break;
                         }
                     }
@@ -396,29 +417,84 @@ public class ChessBoardScreen implements Screen
                     {
                         switch (board[x][y].type) {
                             case BISHOP:
-                                DrawPiece(blackBish, x * 75, y * 75);
+                                pieceToDraw = blackBish;
                                 break;
                             case KNIGHT:
-                                DrawPiece(blackKngt, x * 75, y * 75);
+                                pieceToDraw = blackKngt;
                                 break;
                             case KING:
-                                DrawPiece(blackKing, x * 75, y * 75);
+                                pieceToDraw = blackKing;
                                 break;
                             case QUEEN:
-                                DrawPiece(blackQuen, x * 75, y * 75);
+                                pieceToDraw = blackQuen;
                                 break;
                             case ROOK:
-                                DrawPiece(blackRook, x * 75, y * 75);
+                                pieceToDraw = blackRook;
                                 break;
                             case PAWN:
-                                DrawPiece(blackPawn, x * 75, y * 75);
+                                pieceToDraw = blackPawn;
                                 break;
                         }
                     }
+                    DrawPiece(pieceToDraw, x * 75, y * 75);
                 }
             }
         }
         game.pieceBatch.end();
+    }
+
+    public void DrawSidebar()
+    {
+        game.batch.begin();
+        game.batch.draw(sideboardTexture, 600, 0, 200, 600);
+        game.batch.draw(logoTexture, 600, 550, 200, 30);
+        game.font.setColor(Color.BLACK);
+        String str = "";
+        if (selectedTileX >= 0 && selectedTileY >= 0)
+        {
+            str = ConvertIndexToString(selectedTileX, selectedTileY);
+            if (board[selectedTileX][selectedTileY] != null)
+            {
+                String team = board[selectedTileX][selectedTileY].team.toString();
+                String type = board[selectedTileX][selectedTileY].type.toString();
+                DrawText(team + " " + type, 620, 515);
+            }
+        }
+        DrawText("Current Selected: " + str, 620, 530);
+        DrawText("Game Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 630, 550);
+        DrawText("White Timer: " + whiteTimer.GetMinutesString() + ":" + whiteTimer.GetSecondsString(), 630, 225);
+        DrawText("Black Timer: " + blackTimer.GetMinutesString() + ":" + blackTimer.GetSecondsString(), 630, 405);
+        Vector3 scale = new Vector3(game.font.getData().scaleX, game.font.getData().scaleY, 0);
+        game.font.getData().setScale(scale.x + 1, scale.y + 1);
+        if (currentTurn == ChessPiece.Team.WHITE)
+        {
+            game.font.setColor(Color.WHITE);
+            DrawText("White's Turn", 610, 205);
+        }
+        else
+        {
+            game.font.setColor(Color.BLACK);
+            DrawText("Black's Turn", 615, 435);
+        }
+        game.font.getData().setScale(scale.x, scale.y);
+        game.font.setColor(Color.BLACK);
+
+        for (int i = 0; i < 10; i++)
+        {
+            if (gameMoveHistory[i] != null)
+                DrawText(gameMoveHistory[i], 630, 250 + i * 15);
+        }
+        game.font.setColor(Color.WHITE);
+        for (int y = 0; y < 8; ++y)
+        {
+            for (int x = 0; x < 8; ++x)
+            {
+                DrawText("" + (char)('a' + (char)x), (x * 75.f) + 60.5f, 12);
+            }
+            DrawText("" + (y + 1), 3, (y * 75.f) + 70.5f);
+        }
+        game.font.setColor(Color.BLACK);
+        game.batch.end();
     }
 
     @Override
@@ -441,47 +517,6 @@ public class ChessBoardScreen implements Screen
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        game.batch.draw(sideboardTexture, 600, 0, 200, 600);
-        game.batch.draw(logoTexture, 600, 550, 200, 30);
-        game.font.setColor(Color.BLACK);
-        String str = "";
-        if (selectedTileX >= 0 && selectedTileY >= 0)
-        {
-            str = ConvertIndexToString(selectedTileX, selectedTileY);
-            if (board[selectedTileX][selectedTileY] != null)
-            {
-                String team = board[selectedTileX][selectedTileY].team.toString();
-                String type = board[selectedTileX][selectedTileY].type.toString();
-                DrawText(team + " " + type, 620, 515);
-            }
-        }
-        DrawText("Current Selected: " + str, 620, 530);
-        DrawText("Game Timer: " + globalTimer.GetMinutesString() + ":" + globalTimer.GetSecondsString(), 630, 550);
-        DrawText("White Timer: " + whiteTimer.GetMinutesString() + ":" + whiteTimer.GetSecondsString(), 630, 225);
-        DrawText("Black Timer: " + blackTimer.GetMinutesString() + ":" + blackTimer.GetSecondsString(), 630, 405);
-        if (currentTurn == ChessPiece.Team.WHITE)
-        {
-            Vector3 scale = new Vector3(game.font.getData().scaleX, game.font.getData().scaleY, 0);
-            game.font.getData().setScale(scale.x + 1, scale.y + 1);
-            game.font.setColor(Color.WHITE);
-            DrawText("White's Turn", 610, 205);
-            game.font.getData().setScale(scale.x, scale.y);
-        }
-        else
-        {
-            Vector3 scale = new Vector3(game.font.getData().scaleX, game.font.getData().scaleY, 0);
-            game.font.getData().setScale(scale.x + 1, scale.y + 1);
-            game.font.setColor(Color.BLACK);
-            DrawText("Black's Turn", 615, 435);
-            game.font.getData().setScale(scale.x, scale.y);
-        }
-        game.font.setColor(Color.BLACK);
-
-        for (int i = 0; i < 10; i++)
-        {
-            if (gameMoveHistory[i] != null)
-                DrawText(gameMoveHistory[i], 630, 250 + i * 15);
-        }
 
         for (int y = 0; y < 8; ++y)
         {
@@ -534,21 +569,6 @@ public class ChessBoardScreen implements Screen
                 }
             }
         }
-        game.batch.end();
-        game.batch.begin();
-
-        if (Button(mousePos, "", 75 * 8 + 30, 30, 50, 50))
-        {
-            Gdx.app.log("Chessters", "Resetting!");
-            Setup();
-        }
-
-        if (Button(mousePos, "", 75 * 8 + 110, 30, 50, 50))
-        {
-            Move(0, 0, 0, 0);
-        }
-        game.batch.draw(resetIconTexture, 75 * 8 + 40, 40, 30, 30);
-        game.batch.draw(nextTurnIconTexture, 75 * 8 + 120, 40, 30, 30);
         game.batch.end();
         game.batch.begin();
 
@@ -690,18 +710,14 @@ public class ChessBoardScreen implements Screen
         game.batch.end();
 
         DrawChessPieces();
-
+        DrawSidebar();
         game.batch.begin();
-        game.font.setColor(Color.WHITE);
-        for (int y = 0; y < 8; ++y)
+        if (Button(mousePos, "", 75 * 8 + 30, 30, 50, 50))
         {
-            for (int x = 0; x < 8; ++x)
-            {
-                DrawText("" + (char)('A' + (char)x), (x * 75.f) + 32.5f, 12);
-            }
-            DrawText("" + (y + 1), 3, (y * 75.f) + 42.5f);
+            Gdx.app.log("Chessters", "Resetting!");
+            Setup();
         }
-        game.font.setColor(Color.BLACK);
+        game.batch.draw(resetIconTexture, 75 * 8 + 40, 40, 30, 30);
         game.batch.end();
     }
 
