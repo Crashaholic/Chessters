@@ -617,7 +617,23 @@ public class ChessBoardScreen implements Screen
                             CheckValidMovesInDirection(mousePos, selectedTileX, selectedTileY, -1, 0);
                     break;
                 case KING:
-                    // Add king movement logic here
+                    int[][] kingMoves = {{0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}, {1, 0}, {1, 1}};
+                    for (int[] move : kingMoves)
+                    {
+                        if (CheckBounds(selectedTileX + move[0], selectedTileY + move[1],0, 8, 0, 8))
+                        {
+                            TileStatus ts = GetTileStatus(selectedTileX + move[0], selectedTileY + move[1]);
+                            if (ts == TileStatus.EMPTY || ts == TileStatus.HAS_ENEMY)
+                            {
+                                if (ClickedHighlightedTile(mousePos, selectedTileX + move[0], selectedTileY + move[1]))
+                                {
+                                    Move(selectedTileX, selectedTileY, selectedTileX + move[0], selectedTileY + move[1]);
+                                    hasMoved = true;
+                                    break; // Exit loop after the first valid move
+                                }
+                            }
+                        }
+                    }
                     break;
                 case PAWN:
                     if (currentTurn == ChessPiece.Team.WHITE)
