@@ -20,16 +20,11 @@ public class ChessPiece
 
     public Team team;
     public Piece_Type type;
+    public boolean hasMoved;
     public ChessPiece(Team team, Piece_Type type)
     {
-        super();
         this.team = team;
         this.type = type;
+        this.hasMoved = false;
     }
-
-    public String GetSpriteName()
-    {
-        return ((team == Team.WHITE) ? "w" : "b") + type.toString().toLowerCase();
-    }
-
 }

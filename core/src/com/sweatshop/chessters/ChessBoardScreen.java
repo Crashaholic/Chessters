@@ -55,6 +55,9 @@ public class ChessBoardScreen implements Screen
     private final String[] gameMoveHistory;
     private int gameMovesTurnCount;
 
+    private int enPassantX;
+    private int enPassantY;
+
     OrthographicCamera camera;
     FitViewport fitViewport;
 
@@ -250,6 +253,7 @@ public class ChessBoardScreen implements Screen
         boolean isCapture = GetTileStatus(toX, toY) == TileStatus.HAS_ENEMY;
         board[toX][toY] = board[fromX][fromY];
         board[fromX][fromY] = null;
+        board[toX][toY].hasMoved = true;
         if (isCapture)
         {
             if (t == ChessPiece.Piece_Type.PAWN)
@@ -275,6 +279,35 @@ public class ChessBoardScreen implements Screen
             currentTurn = ChessPiece.Team.WHITE;
         }
     }
+
+    //meant *specifically* for en passant
+    public void ExecuteEnPassant(int fromX, int fromY, int toX, int toY)
+    {
+        String move = "";
+        board[toX][toY] = board[fromX][fromY];
+        board[fromX][fromY] = null;
+        board[toX][toY - ((currentTurn == ChessPiece.Team.WHITE) ? 1 : -1)] = null;
+        board[toX][toY].hasMoved = true;
+        move += ConvertIndexToString(fromX, fromY).charAt(0);
+        move += "x";
+        move += ConvertIndexToString(toX, toY);
+        if (currentTurn == ChessPiece.Team.WHITE)
+        {
+            PushToHistory(gameMovesTurnCount + ": " + move + " e.p.");
+            currentTurn = ChessPiece.Team.BLACK;
+        }
+        else
+        {
+            gameMoveHistory[0] += " " + move + " e.p.";
+            gameMovesTurnCount++;
+            currentTurn = ChessPiece.Team.WHITE;
+        }
+    }
+
+    public void ExecuteCastling(boolean queenSide)
+    {
+
+    }
     
     public void Setup()
     {
@@ -299,6 +332,8 @@ public class ChessBoardScreen implements Screen
                 board[x][y] = null;
             }
         }
+
+        enPassantX = enPassantY = -1;
 
         board[0][0] = new ChessPiece(ChessPiece.Team.WHITE, ChessPiece.Piece_Type.ROOK);
         board[1][0] = new ChessPiece(ChessPiece.Team.WHITE, ChessPiece.Piece_Type.KNIGHT);
@@ -570,10 +605,11 @@ public class ChessBoardScreen implements Screen
             }
         }
         game.batch.end();
-        game.batch.begin();
 
+        game.batch.begin();
         if (selectedTileX >= 0 && selectedTileY >= 0 && board[selectedTileX][selectedTileY] != null) {
             boolean hasMoved = false;
+            boolean enPassantJustOpened = false;
             switch (board[selectedTileX][selectedTileY].type) {
                 case BISHOP:
                     hasMoved = CheckValidMovesInDirection(mousePos, selectedTileX, selectedTileY, 1, 1) ||
@@ -636,84 +672,59 @@ public class ChessBoardScreen implements Screen
                     }
                     break;
                 case PAWN:
-                    if (currentTurn == ChessPiece.Team.WHITE)
-                    {
-                        if (selectedTileY == 1)
-                        {
-                            TileStatus ts = GetTileStatus(selectedTileX, selectedTileY + 1);
-                            if (ts == TileStatus.EMPTY || ts == TileStatus.HAS_ENEMY)
-                            {
-                                if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY + 2))
-                                {
-                                    Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 2);
-                                    hasMoved = true;
-                                }
+                    int direction = (currentTurn == ChessPiece.Team.WHITE) ? 1 : -1; // Determine the direction of pawn movement based on the current turn
+                    // Check if the pawn is at its starting position and can move two squares forward
+                    if ((selectedTileY == 1 && direction == 1) || (selectedTileY == 6 && direction == -1)) {
+                        TileStatus ts = GetTileStatus(selectedTileX, selectedTileY + direction);
+                        if (ts == TileStatus.EMPTY) {
+                            if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY + 2 * direction)) {
+                                Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 2 * direction);
+                                enPassantJustOpened = true;
+                                enPassantX = selectedTileX;
+                                enPassantY = selectedTileY + direction;
+                                hasMoved = true;
+                                break;
                             }
                         }
-                        TileStatus ts = GetTileStatus(selectedTileX, selectedTileY + 1);
-                        TileStatus leftdiagts = GetTileStatus(selectedTileX-1, selectedTileY+1);
-                        TileStatus rightdiagts = GetTileStatus(selectedTileX+1, selectedTileY+1);
-                        if (ts == TileStatus.EMPTY)
-                        {
-                            if (ClickedHighlightedTile(mousePos, selectedTileX, (selectedTileY + 1)))
-                            {
-                                Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 1);
-                                hasMoved = true;
-                            }
-                        }
-                        if (leftdiagts == TileStatus.HAS_ENEMY)
-                            if (ClickedHighlightedTile(mousePos, selectedTileX-1, (selectedTileY + 1)))
-                            {
-                                Move(selectedTileX, selectedTileY, selectedTileX-1, selectedTileY + 1);
-                                hasMoved = true;
-                            }
-
-                        if (rightdiagts == TileStatus.HAS_ENEMY)
-                            if (ClickedHighlightedTile(mousePos, selectedTileX+1, (selectedTileY + 1)))
-                            {
-                                Move(selectedTileX, selectedTileY, selectedTileX+1, selectedTileY + 1);
-                                hasMoved = true;
-                            }
-
                     }
-                    else
-                    {
-                        if (selectedTileY == 6)
-                        {
-                            TileStatus ts = GetTileStatus(selectedTileX, selectedTileY - 1);
-                            if (ts == TileStatus.EMPTY || ts == TileStatus.HAS_ENEMY)
-                            {
-                                if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY - 2))
-                                {
-                                    Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY - 2);
-                                    hasMoved = true;
-                                }
-                            }
-                        }
-                        TileStatus ts = GetTileStatus(selectedTileX, selectedTileY - 1);
-                        TileStatus leftdiagts = GetTileStatus(selectedTileX-1, selectedTileY-1);
-                        TileStatus rightdiagts = GetTileStatus(selectedTileX+1, selectedTileY-1);
-                        if (ts == TileStatus.EMPTY)
-                        {
-                            if (ClickedHighlightedTile(mousePos, selectedTileX, (selectedTileY - 1)))
-                            {
-                                Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY - 1);
-                                hasMoved = true;
-                            }
-                        }
-                        if (leftdiagts == TileStatus.HAS_ENEMY)
-                            if (ClickedHighlightedTile(mousePos, selectedTileX-1, (selectedTileY - 1)))
-                            {
-                                Move(selectedTileX, selectedTileY, selectedTileX-1, selectedTileY - 1);
-                                hasMoved = true;
-                            }
 
-                        if (rightdiagts == TileStatus.HAS_ENEMY)
-                            if (ClickedHighlightedTile(mousePos, selectedTileX+1, (selectedTileY - 1)))
-                            {
-                                Move(selectedTileX, selectedTileY, selectedTileX+1, selectedTileY - 1);
-                                hasMoved = true;
-                            }
+                    // Check for regular pawn move one square forward
+                    TileStatus ts = GetTileStatus(selectedTileX, selectedTileY + direction);
+                    if (ts == TileStatus.EMPTY) {
+                        if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY + direction)) {
+                            Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + direction);
+                            hasMoved = true;
+                            break;
+                        }
+                    }
+
+                    if (selectedTileY + direction == enPassantY && (selectedTileX - 1 == enPassantX || selectedTileX + 1 == enPassantX)) {
+                        // Check if the move is a capturing move
+                        if (ClickedHighlightedTile(mousePos, enPassantX, enPassantY)) {
+                            // Execute en passant capture
+                            ExecuteEnPassant(selectedTileX, selectedTileY, enPassantX, enPassantY);
+                            hasMoved = true;
+                            break;
+                        }
+                    }
+
+                    // Check for diagonal captures
+                    TileStatus leftDiagTs = GetTileStatus(selectedTileX - 1, selectedTileY + direction);
+                    TileStatus rightDiagTs = GetTileStatus(selectedTileX + 1, selectedTileY + direction);
+
+                    if (leftDiagTs == TileStatus.HAS_ENEMY) {
+                        if (ClickedHighlightedTile(mousePos, selectedTileX - 1, selectedTileY + direction)) {
+                            Move(selectedTileX, selectedTileY, selectedTileX - 1, selectedTileY + direction);
+                            hasMoved = true;
+                            break;
+                        }
+                    }
+
+                    if (rightDiagTs == TileStatus.HAS_ENEMY) {
+                        if (ClickedHighlightedTile(mousePos, selectedTileX + 1, selectedTileY + direction)) {
+                            Move(selectedTileX, selectedTileY, selectedTileX + 1, selectedTileY + direction);
+                            hasMoved = true;
+                        }
                     }
                     break;
                 default:
@@ -721,6 +732,10 @@ public class ChessBoardScreen implements Screen
             }
             if (hasMoved) {
                 ResetSelection();
+                if (enPassantJustOpened)
+                    enPassantJustOpened = false;
+                else
+                    enPassantX = enPassantY = -1;
             }
         }
         game.batch.end();
