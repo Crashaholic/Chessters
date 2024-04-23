@@ -290,16 +290,29 @@ public class ChessBoardScreen implements Screen
         }
     }
 
-    /*checks to see if king is in check when its in this tile*/
-//    public boolean CheckCheck(int tileToCheckX, int tileToCheckY)
-//    {
-//        return false;
-//    }
-//
-//    public boolean CheckCheckmate()
-//    {
-//        return false;
-//    }
+    /*checks to see if king is in check when its in this tile
+    * returns True IF BEING ON THE TILE WILL CHECK*/
+    public boolean CheckCheck(int tileToCheckX, int tileToCheckY)
+    {
+        if (CheckBounds(tileToCheckX, tileToCheckY, 0, 8, 0 ,8))
+        {
+
+        }
+        return false;
+    }
+
+    public boolean CheckCheckmate(int tileToCheckX, int tileToCheckY)
+    {
+        return  CheckCheck(tileToCheckX - 1, tileToCheckY + 1) ||
+                CheckCheck(tileToCheckX    , tileToCheckY + 1)||
+                CheckCheck(tileToCheckX + 1, tileToCheckY + 1)||
+                CheckCheck(tileToCheckX - 1, tileToCheckY)||
+                CheckCheck(tileToCheckX    , tileToCheckY)||
+                CheckCheck(tileToCheckX + 1, tileToCheckY)||
+                CheckCheck(tileToCheckX + 1, tileToCheckY - 1)||
+                CheckCheck(tileToCheckX, tileToCheckY - 1)||
+                CheckCheck(tileToCheckX - 1, tileToCheckY - 1);
+    }
 
     //meant *specifically* for en passant
     public void ExecuteEnPassant(int fromX, int fromY, int toX, int toY)
@@ -663,6 +676,7 @@ public class ChessBoardScreen implements Screen
         game.batch.begin();
         if (selectedTileX >= 0 && selectedTileY >= 0 && board[selectedTileX][selectedTileY] != null) {
             boolean hasMoved = false;
+            @SuppressWarnings("unused")
             boolean enPassantJustOpened = false;
             switch (board[selectedTileX][selectedTileY].type) {
                 case BISHOP:
@@ -777,23 +791,25 @@ public class ChessBoardScreen implements Screen
 
                             if (king_QueensideCastle)
                             {
-                                // TODO: CHECK FOR CHECKS ON THE TILE
-                                //if (CheckCheck(1, selectedTileY))
-                                if (ClickedHighlightedTile(mousePos, 2, selectedTileY))
+                                if (!CheckCheck(1, selectedTileY))
                                 {
-                                    ExecuteCastling(true);
-                                    hasMoved = true;
+                                    if (ClickedHighlightedTile(mousePos, 2, selectedTileY))
+                                    {
+                                        ExecuteCastling(true);
+                                        hasMoved = true;
+                                    }
                                 }
                             }
 
                             if (king_KingsideCastle)
                             {
-                                // TODO: CHECK FOR CHECKS ON THE TILE
-                                //if (CheckCheck(6, selectedTileY))
-                                if (ClickedHighlightedTile(mousePos, 6, selectedTileY))
+                                if (!CheckCheck(6, selectedTileY))
                                 {
-                                    ExecuteCastling(false);
-                                    hasMoved = true;
+                                    if (ClickedHighlightedTile(mousePos, 6, selectedTileY))
+                                    {
+                                        ExecuteCastling(false);
+                                        hasMoved = true;
+                                    }
                                 }
                             }
                         }
