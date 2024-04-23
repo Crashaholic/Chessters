@@ -16,10 +16,12 @@ public class ChessBoardScreen implements Screen
     public ChessPiece[/*column*/][/*row*/] board;
 
     private final Texture hlghtTile;
-    private final Texture hlghtTile2;
+    private final Texture checkTile;
     private final Texture slectTile;
     private final Texture whiteTile;
     private final Texture blackTile;
+    private final Texture hlghtTile2;
+    private final Texture checkTile2;
 
     private final Texture whiteRook;
     private final Texture whiteKing;
@@ -58,6 +60,9 @@ public class ChessBoardScreen implements Screen
     private int enPassantX;
     private int enPassantY;
 
+    private boolean king_QueensideCastle = true;
+    private boolean king_KingsideCastle = true;
+
     OrthographicCamera camera;
     FitViewport fitViewport;
 
@@ -85,15 +90,20 @@ public class ChessBoardScreen implements Screen
         gameMoveHistory = new String[10];
 
         hlghtTile = new Texture(Gdx.files.internal("htile.png"));
+        checkTile = new Texture(Gdx.files.internal("ctile.png"));
         slectTile = new Texture(Gdx.files.internal("stile.png"));
         whiteTile = new Texture(Gdx.files.internal("wtile.png"));
         blackTile = new Texture(Gdx.files.internal("btile.png"));
         hlghtTile2= new Texture(Gdx.files.internal("htile2.png"));
+        checkTile2= new Texture(Gdx.files.internal("ctile2.png"));
 
         hlghtTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        checkTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         slectTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         whiteTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         blackTile.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        hlghtTile2.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        checkTile2.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         whiteRook = new Texture(Gdx.files.internal("wrook.png"));
         whiteKing = new Texture(Gdx.files.internal("wking.png"));
@@ -280,6 +290,17 @@ public class ChessBoardScreen implements Screen
         }
     }
 
+    /*checks to see if king is in check when its in this tile*/
+//    public boolean CheckCheck(int tileToCheckX, int tileToCheckY)
+//    {
+//        return false;
+//    }
+//
+//    public boolean CheckCheckmate()
+//    {
+//        return false;
+//    }
+
     //meant *specifically* for en passant
     public void ExecuteEnPassant(int fromX, int fromY, int toX, int toY)
     {
@@ -306,7 +327,38 @@ public class ChessBoardScreen implements Screen
 
     public void ExecuteCastling(boolean queenSide)
     {
-
+        String move = "";
+        if (queenSide)
+        {
+            board[2][selectedTileY] = board[selectedTileX][selectedTileY];
+            board[3][selectedTileY] = board[0][selectedTileY];
+            board[2][selectedTileY].hasMoved = true;
+            board[3][selectedTileY].hasMoved = true;
+            board[selectedTileX][selectedTileY] = null;
+            board[0][selectedTileY] = null;
+            move += "0-0-0";
+        }
+        else
+        {
+            board[6][selectedTileY] = board[selectedTileX][selectedTileY];
+            board[5][selectedTileY] = board[7][selectedTileY];
+            board[6][selectedTileY].hasMoved = true;
+            board[5][selectedTileY].hasMoved = true;
+            board[selectedTileX][selectedTileY] = null;
+            board[7][selectedTileY] = null;
+            move += "0-0";
+        }
+        if (currentTurn == ChessPiece.Team.WHITE)
+        {
+            PushToHistory(gameMovesTurnCount + ": " + move);
+            currentTurn = ChessPiece.Team.BLACK;
+        }
+        else
+        {
+            gameMoveHistory[0] += " " + move + " e.p.";
+            gameMovesTurnCount++;
+            currentTurn = ChessPiece.Team.WHITE;
+        }
     }
     
     public void Setup()
@@ -513,6 +565,8 @@ public class ChessBoardScreen implements Screen
         }
         game.font.getData().setScale(scale.x, scale.y);
         game.font.setColor(Color.BLACK);
+        DrawText("Kingside Castling avail: " + king_KingsideCastle, 600, 185);
+        DrawText("Queenside Castling avail: " + king_QueensideCastle, 600, 197);
 
         for (int i = 0; i < 10; i++)
         {
@@ -670,6 +724,80 @@ public class ChessBoardScreen implements Screen
                             }
                         }
                     }
+                    if (!hasMoved)
+                    {
+                        king_KingsideCastle = true;
+                        king_QueensideCastle = true;
+                        if (GetPieceAtTile(selectedTileX, selectedTileY).hasMoved)
+                        {
+                            king_KingsideCastle = king_QueensideCastle = false;
+                        }
+                        else
+                        {
+                            for (int i = 0; i < 8; ++i)
+                            {
+                                // queenside castling
+                                ChessPiece pieceAtTile = GetPieceAtTile(i, selectedTileY);
+                                // if there are pieces between the king and the queenside rook
+                                if (pieceAtTile != null)
+                                {
+                                    if (pieceAtTile.type == ChessPiece.Piece_Type.ROOK)
+                                    {
+                                        if (pieceAtTile.hasMoved)
+                                        {
+                                            // Queenside rook has moved, disable queenside castling
+                                            if (i < selectedTileX)
+                                            {
+                                                king_QueensideCastle = false;
+                                                i = selectedTileX;
+                                            }
+                                            else if (i > selectedTileX)
+                                            {
+                                                king_KingsideCastle = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Piece other than rook found, disable castling if it's on the king's path
+                                        if (i < selectedTileX)
+                                        {
+                                            king_QueensideCastle = false;
+                                            i = selectedTileX;
+                                        }
+                                        else if (i > selectedTileX)
+                                        {
+                                            king_KingsideCastle = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (king_QueensideCastle)
+                            {
+                                // TODO: CHECK FOR CHECKS ON THE TILE
+                                //if (CheckCheck(1, selectedTileY))
+                                if (ClickedHighlightedTile(mousePos, 2, selectedTileY))
+                                {
+                                    ExecuteCastling(true);
+                                    hasMoved = true;
+                                }
+                            }
+
+                            if (king_KingsideCastle)
+                            {
+                                // TODO: CHECK FOR CHECKS ON THE TILE
+                                //if (CheckCheck(6, selectedTileY))
+                                if (ClickedHighlightedTile(mousePos, 6, selectedTileY))
+                                {
+                                    ExecuteCastling(false);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                    }
                     break;
                 case PAWN:
                     int direction = (currentTurn == ChessPiece.Team.WHITE) ? 1 : -1; // Determine the direction of pawn movement based on the current turn
@@ -677,13 +805,16 @@ public class ChessBoardScreen implements Screen
                     if ((selectedTileY == 1 && direction == 1) || (selectedTileY == 6 && direction == -1)) {
                         TileStatus ts = GetTileStatus(selectedTileX, selectedTileY + direction);
                         if (ts == TileStatus.EMPTY) {
-                            if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY + 2 * direction)) {
-                                Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 2 * direction);
-                                enPassantJustOpened = true;
-                                enPassantX = selectedTileX;
-                                enPassantY = selectedTileY + direction;
-                                hasMoved = true;
-                                break;
+                            ts = GetTileStatus(selectedTileX, selectedTileY + direction * 2);
+                            if (ts == TileStatus.EMPTY) {
+                                if (ClickedHighlightedTile(mousePos, selectedTileX, selectedTileY + 2 * direction)) {
+                                    Move(selectedTileX, selectedTileY, selectedTileX, selectedTileY + 2 * direction);
+                                    enPassantJustOpened = true;
+                                    enPassantX = selectedTileX;
+                                    enPassantY = selectedTileY + direction;
+                                    hasMoved = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -779,8 +910,10 @@ public class ChessBoardScreen implements Screen
         nextTurnIconTexture.dispose();
         resetIconTexture.dispose();
         hlghtTile2.dispose();
+        checkTile2.dispose();
 
         hlghtTile.dispose();
+        checkTile.dispose();
         slectTile.dispose();
         whiteTile.dispose();
         blackTile.dispose();
